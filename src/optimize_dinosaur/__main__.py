@@ -9,7 +9,7 @@ Created on Tue Jul 30 16:42:32 2024
 import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument('-t', '--task', action = 'store', choices = ['initialize_workspace', 
-                                                                 'preliminary_trials',
+                                                                 'initial_trials',
                                                                  'genetic_optimization'],
                     help = 'Which task to perform')
 parser.add_argument('-i', '--index', action = 'store', type = int, required = False, default = -1,
@@ -19,13 +19,15 @@ parser.add_argument('-d', '--directory', action = 'store', required = False, def
 args = parser.parse_args()
 
 from optimize_dinosaur.initialize_workspace import make_workspace
-
+from optimize_dinosaur.initial_trials import run_trial
+from optimize_dinosaur.optimizer_job import run_job
 
 if args.task == 'initialize_workspace':
     make_workspace(args.directory)
 
-elif args.task == 'preliminary_trials':
-    pass
+elif args.task == 'initial_trials':
+    run_trial(args.index)
+
 elif args.task == 'genetic_optimization':
-    pass
+    run_job(args.index)
 
