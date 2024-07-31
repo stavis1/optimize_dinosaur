@@ -27,7 +27,8 @@ def peptide_rollup(base_name, job):
     from sortedcontainers import SortedList
     import pandas as pd
     import numpy as np
-
+    
+    H = 1.007276
 
     #read in data
     charges = [int(c) for c in job['charges'].split(',')]
@@ -39,7 +40,7 @@ def peptide_rollup(base_name, job):
     global psm_rt
     psm_rt = {i:r for i,r in zip(psms.index, psms['RT [min]'])}
     global psm_mass
-    psm_mass = {i:m for i,m in zip(psms.index, psms['Theo. MH+ [Da]'])}
+    psm_mass = {i:m for i,m in zip(psms.index, psms['Theo. MH+ [Da]'] - H)}
     seq_prots = {s:p for s,p in zip(psms['Annotated Sequence'], psms['Protein Accessions'])}
 
     #build feature indices for fast lookup
@@ -50,7 +51,7 @@ def peptide_rollup(base_name, job):
     global mass_idx
     mass_idx = SortedList(zip(features['mass'], features.index))
     global mass_H_idx
-    mass_H_idx = SortedList(zip(features['mass'] + (1.007276*features['charge']), features.index))
+    mass_H_idx = SortedList(zip(features['mass'] - (H*features['charge']), features.index))
     features['intensityCorr'] = features['intensitySum']/features['charge']
     feature_intensity = {idx:i for idx,i in zip(features.index, features['intensityCorr'])}
     
@@ -119,11 +120,30 @@ def peptide_rollup(base_name, job):
                                 columns = ('sequence', 'intensity', 'psm_indices', 'feature_indices', 'proteins'))
     peptide_data.to_csv(f'{base_name}.peptides.txt', sep = '\t', index = False)
 
-def process_results(base_names):
+def process_results(base_names, job):
     from collections import defaultdict
     import numpy as np
+    import pandas as pd
     
-    
+    peptide_quants = defaultdict(lambda:[np.nan]*2)
+    allseqs = set([])
+    for i,base_name in enumerate(base_names):
+        PSM_data = pd.read_csv(f'{base_name}_PSMs.txt', sep = '\t')
+        allseqs.update(PSM_data['Annotated Sequence']) 
+        
+        peptide_data = pd.read_csv(f'{base_name}.peptides.txt', sep = '\t')
+        for seq, intensity in zip(peptide_data['sequence'], peptide_data['intensity']):
+            peptide_quants[seq][i] = intensity
+    peptide_quants = np.array(list(peptide_quants.values()))
+    depth = np.sum(np.isnan(peptide_quants))/len(allseqs)
+    jaccard = np.sum(np.all(np.isfinite(peptide_quants), axis = 1))/peptide_quants.shape[0]
+    peptide_quants = peptide_quants[np.all(np.isfinite(peptide_quants), axis = 1),:]
+    means = np.mean(peptide_quants, axis = 1)
+    diffs = np.abs(peptide_quants[:,0] - peptide_quants[:,1])
+    mre = np.mean(diffs/means)
+    result_line = list(job.values()) + [mre, jaccard, depth]
+    with open('../outcomes.tsv', 'a') as tsv:
+        tsv.write('\t'.join(str(r) for r in result_line) + '\n')
 
 def run_job(job):
     import os
@@ -159,12 +179,11 @@ def run_job(job):
         peptide_rollup(name, job)
     
     #process results
-    process_results(base_names)
+    process_results(base_names, job)
     
     #clean up temporary files
     os.chdir('..')
     shutil.rmtree(tmpdir)
-    pass
 
 
 
