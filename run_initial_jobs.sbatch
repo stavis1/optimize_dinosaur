@@ -1,0 +1,18 @@
+#!/bin/bash
+
+#SBATCH -A ACF-UTK0011
+#SBATCH -p campus
+#SBATCH --qos=campus
+#SBATCH -t 24:00:00
+#SBATCH --nodes=1
+#SBATCH -c 8
+#SBATCH --mem=32g
+#SBATCH -J batch1_searches
+#SBATCH --output=batch1_searches_out_%j_%a.log
+#SBATCH --error=batch1_searches_err_%j_%a.log
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=stavis@vols.utk.edu
+
+conda run -p ~/optimize_dinosaur/env/od_env python -m optimize_dinosaur -t initial_trials -i $SLURM_ARRAY_TASK_ID
+
+
