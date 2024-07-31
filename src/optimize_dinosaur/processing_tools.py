@@ -12,10 +12,7 @@ def map_feature(psm_idx):
     rtstart_set = set((i[1] for i in rtstart_idx.irange((rt-max_rt_width,), (rt,))))
     rtend_set = set((i[1] for i in rtend_idx.irange((rt,), (rt+max_rt_width,))))
     rt_set = rtstart_set.intersection(rtend_set)
-    if job_params['add_H']:
-        mass_set = set((i[1] for i in mass_H_idx.irange((mass-ppm,),(mass+ppm,))))
-    else:
-        mass_set = set((i[1] for i in mass_idx.irange((mass-ppm,),(mass+ppm,))))
+    mass_set = set((i[1] for i in mass_idx.irange((mass-ppm,),(mass+ppm,))))
     feature_set = rt_set.intersection(mass_set)
     return feature_set
 
@@ -50,8 +47,6 @@ def peptide_rollup(base_name, job):
     rtend_idx = SortedList(zip(features['rtEnd'], features.index))
     global mass_idx
     mass_idx = SortedList(zip(features['mass'], features.index))
-    global mass_H_idx
-    mass_H_idx = SortedList(zip(features['mass'] - (H*features['charge']), features.index))
     features['intensityCorr'] = features['intensitySum']/features['charge']
     feature_intensity = {idx:i for idx,i in zip(features.index, features['intensityCorr'])}
     
@@ -135,7 +130,7 @@ def process_results(base_names, job):
         for seq, intensity in zip(peptide_data['sequence'], peptide_data['intensity']):
             peptide_quants[seq][i] = intensity
     peptide_quants = np.array(list(peptide_quants.values()))
-    depth = np.sum(np.isnan(peptide_quants))/len(allseqs)
+    depth = np.sum(np.isnan(peptide_quants))/(len(allseqs)*2)
     jaccard = np.sum(np.all(np.isfinite(peptide_quants), axis = 1))/peptide_quants.shape[0]
     peptide_quants = peptide_quants[np.all(np.isfinite(peptide_quants), axis = 1),:]
     means = np.mean(peptide_quants, axis = 1)
