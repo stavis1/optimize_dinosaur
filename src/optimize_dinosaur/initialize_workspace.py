@@ -8,9 +8,14 @@ Created on Tue Jul 30 15:06:37 2024
 
 def make_workspace(target):
     import os
+    import subprocess
     import pandas as pd
     from optimize_dinosaur.shared_data import params    
     os.chdir(target)
+    
+    if not os.path.exists('Dinosaur.jar'):
+        subprocess.run('wget https://github.com/fickludd/dinosaur/releases/download/1.2.0/Dinosaur-1.2.0.free.jar -O Dinosaur.jar',
+                       shell = True)
 
     #set up results files
     empty_params = pd.DataFrame({k:[] for k in params.keys()})

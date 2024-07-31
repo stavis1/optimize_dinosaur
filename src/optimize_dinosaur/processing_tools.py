@@ -17,7 +17,7 @@ def run_job(job):
     import subprocess
     import shutil
     
-    from shared_data import dinosaur_param_set
+    from optimize_dinosaur.shared_data import dinosaur_param_set
     
     #write job paramters
     with open('attempted_solutions.tsv', 'a') as tsv:
@@ -28,23 +28,18 @@ def run_job(job):
     os.mkdir(tmpdir)
     mzmls = [f for f in os.listdir() if f.endswith('.mzML')]
     base_names = [f[:-5] for f in mzmls]
-    psms = [f for f in os.listdir() if f.endswith('.pout')]
+    psms = [f for f in os.listdir() if f.endswith('PeptideGroups.txt')]
     os.chdir(tmpdir)
     for file in mzmls + psms:
         os.link(f'../{file}', file)
     
     
-    #run Dinosaur
-    def flag(k,v):
-        if type(v) == bool:
-            return f'--{k}' if v else ''
-        else:
-            return f'--{k} {v}'
-    
-    dinosaur_param_string = ' '.join(flag(k,v) for k,v in job.items() if k in dinosaur_param_set)
+    #run Dinosaur    
+    with open('dinosaur.params', 'w') as params:
+        params.write('\n'.join(f'{k}={v}' for k,v in job.items() if k in dinosaur_param_set))
     
     for mzml in mzmls:
-        subprocess.run(f'java -jar ../Dinosaur.jar {dinosaur_param_string} {mzml}', shell = True)
+        subprocess.run(f'java -jar ../Dinosaur.jar --advParams={os.path.abspath("dinosaur.params")} --concurrency=8 {mzml}', shell = True)
     
     #run peptide rollup
     for name in base_names:
