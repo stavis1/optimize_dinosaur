@@ -7,12 +7,12 @@ Created on Tue Jul 30 16:59:19 2024
 """
 from copy import copy
 
-corr_set = ['0.6', '0.4', '0.8', '0.2', '0.9', '0.95', '0.0']
+corr_set = ['0.6', '0.4', '0.8', '0.2', '0.9', '0.95', '0.0', '0.01']
 dinosaur_params = {'averagineCorr' : corr_set,
                    'averagineExplained' : ['0.5', '0.45', '0.48', '0.51', '0.53', '0.55'],
-                   'chargePairPPM' : ['7.0', '1.0', '20.0'],
+                   'chargePairPPM' : ['7.0', '2.0', '8.0', '10.0', '15.0', '20.0'],
                    'deisoCorr' : corr_set,
-                   'hillMaxMissing' : ['1', '6', '12'],
+                   'hillMaxMissing' : ['1', '2', '4', '6', '12'],
                    'hillMinLength' : ['3', '1', '2', '6', '12'],
                    'hillPPM' : ['8.0', '5.0', '3.0', '10.0', '20.0'],
                    'hillPeakFactor' : ['2', '1', '3', '4', '5'],
