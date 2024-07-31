@@ -36,7 +36,8 @@ dinosaur_params = {'averagineCorr' : corr_set,
 dinosaur_param_set = set(dinosaur_params.keys())
 
 pep_rollup_params = {'ppm':['5', '8', '10'],
-                     'charges':['1,2,3,4,5,6','1,2,3,4','2,3,4']}
+                     'charges':['1,2,3,4,5,6','1,2,3,4','2,3,4'],
+                     'add_H':[False, True]}
 pep_rollup_param_set = set(pep_rollup_params.keys())
 
 params = copy(dinosaur_params)

@@ -5,12 +5,125 @@ Created on Tue Jul 30 17:35:44 2024
 
 @author: 4vt
 """
+def map_feature(psm_idx):
+    rt = psm_rt[psm_idx]
+    mass = psm_mass[psm_idx]
+    ppm = (mass/1e6)*float(job_params['ppm'])
+    rtstart_set = set((i[1] for i in rtstart_idx.irange((rt-max_rt_width,), (rt,))))
+    rtend_set = set((i[1] for i in rtend_idx.irange((rt,), (rt+max_rt_width,))))
+    rt_set = rtstart_set.intersection(rtend_set)
+    if job_params['add_H']:
+        mass_set = set((i[1] for i in mass_H_idx.irange((mass-ppm,),(mass+ppm,))))
+    else:
+        mass_set = set((i[1] for i in mass_idx.irange((mass-ppm,),(mass+ppm,))))
+    feature_set = rt_set.intersection(mass_set)
+    return feature_set
 
-def peptide_rollup(base_name, params):
-    pass
+def peptide_rollup(base_name, job):
+    global job_params
+    job_params = job
+    from multiprocessing import Pool
+    from collections import defaultdict
+    from sortedcontainers import SortedList
+    import pandas as pd
+    import numpy as np
+
+
+    #read in data
+    charges = [int(c) for c in job['charges'].split(',')]
+    features = pd.read_csv(f'{base_name}.features.tsv', sep = '\t')
+    features = features[[c in charges for c in features['charge']]]
+    psms = pd.read_csv(f'{base_name}_PSMs.txt', sep = '\t')
+
+    #build psm index dictionaries for fast lookup
+    global psm_rt
+    psm_rt = {i:r for i,r in zip(psms.index, psms['RT [min]'])}
+    global psm_mass
+    psm_mass = {i:m for i,m in zip(psms.index, psms['Theo. MH+ [Da]'])}
+    seq_prots = {s:p for s,p in zip(psms['Annotated Sequence'], psms['Protein Accessions'])}
+
+    #build feature indices for fast lookup
+    global rtstart_idx
+    rtstart_idx = SortedList(zip(features['rtStart'], features.index))
+    global rtend_idx
+    rtend_idx = SortedList(zip(features['rtEnd'], features.index))
+    global mass_idx
+    mass_idx = SortedList(zip(features['mass'], features.index))
+    global mass_H_idx
+    mass_H_idx = SortedList(zip(features['mass'] + (1.007276*features['charge']), features.index))
+    features['intensityCorr'] = features['intensitySum']/features['charge']
+    feature_intensity = {idx:i for idx,i in zip(features.index, features['intensityCorr'])}
+    
+    global max_rt_width
+    max_rt_width = max(features['rtEnd'] - features['rtStart'])
+
+    #parallelize map_feature() calls
+    with Pool(8) as p:
+        feature_map = p.map(map_feature, range(psms.shape[0]))
+
+    #peptide rollup 
+    class peptide():
+        def __init__(self, seq):
+            self.seq = seq
+            self.psm_indices = []
+            self.features = set([])
+            self.proteins = seq_prots[self.seq]
+        
+        def add_psm(self, psm_index, features):
+            self.psm_indices.append(psm_index)
+            self.features.update(features)
+        
+        def remove_bad_features(self, bad_features):
+            self.features = [f for f in self.features if f not in bad_features]
+            
+        def calculate_intensity(self, intensity_map):
+            self.intensity = np.sum([intensity_map[f] for f in self.features])
+        
+        def report(self):
+            return (self.seq, 
+                    self.intensity, 
+                    ';'.join((str(i) for i in self.psm_indices)), 
+                    ';'.join((str(i) for i in self.features)),
+                    self.proteins)
+
+    class keydefaultdict(defaultdict):
+        def __missing__(self, key):
+            if self.default_factory is None:
+                raise KeyError( key )
+            else:
+                ret = self[key] = self.default_factory(key)
+                return ret
+
+    peptides = keydefaultdict(peptide)
+    for seq, psm, feature_set in zip(psms['Annotated Sequence'], psms.index, feature_map):
+        if feature_set:
+            peptides[seq].add_psm(psm, feature_set)
+
+    #remove degenerate features
+    feature_peptides = defaultdict(lambda:[])
+    for peptide in peptides.values():
+        for feature in peptide.features:
+            feature_peptides[feature].append(peptide.seq)
+    bad_features = set(f for f,p in feature_peptides.items() if len(p) > 1)
+
+    for peptide in peptides.values():
+        peptide.remove_bad_features(bad_features)
+    peptide_list = [pep for pep in peptides.values() if pep.features]
+
+    #calculate intensity
+    for peptide in peptide_list:
+        peptide.calculate_intensity(feature_intensity)
+
+    #report
+    peptide_data = pd.DataFrame(np.array([p.report() for p in peptide_list]),
+                                columns = ('sequence', 'intensity', 'psm_indices', 'feature_indices', 'proteins'))
+    peptide_data.to_csv(f'{base_name}.peptides.txt', sep = '\t', index = False)
 
 def process_results(base_names):
-    pass
+    from collections import defaultdict
+    import numpy as np
+    
+    
 
 def run_job(job):
     import os
@@ -28,7 +141,7 @@ def run_job(job):
     os.mkdir(tmpdir)
     mzmls = [f for f in os.listdir() if f.endswith('.mzML')]
     base_names = [f[:-5] for f in mzmls]
-    psms = [f for f in os.listdir() if f.endswith('PeptideGroups.txt')]
+    psms = [f for f in os.listdir() if f.endswith('_PSMs.txt')]
     os.chdir(tmpdir)
     for file in mzmls + psms:
         os.link(f'../{file}', file)
