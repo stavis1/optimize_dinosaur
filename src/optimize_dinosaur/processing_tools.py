@@ -28,7 +28,7 @@ def peptide_rollup(base_name, job):
     H = 1.007276
 
     #read in data
-    charges = [int(c) for c in job['charges'].split(',')]
+    charges = set(range(7))
     features = pd.read_csv(f'{base_name}.features.tsv', sep = '\t')
     features = features[[c in charges for c in features['charge']]]
     psms = pd.read_csv(f'{base_name}_PSMs.txt', sep = '\t')
