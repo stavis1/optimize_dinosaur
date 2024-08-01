@@ -158,24 +158,27 @@ def run_job(job):
     base_names = [f[:-5] for f in mzmls]
     psms = [f for f in os.listdir() if f.endswith('_PSMs.txt')]
     os.chdir(tmpdir)
-    for file in mzmls + psms:
-        os.link(f'../{file}', file)
+    try:
+        for file in mzmls + psms:
+            os.link(f'../{file}', file)
+        
+        
+        #run Dinosaur    
+        with open('dinosaur.params', 'w') as params:
+            params.write('\n'.join(f'{k}={v}' for k,v in job.items() if k in dinosaur_param_set))
+        
+        for mzml in mzmls:
+            subprocess.run(f'java -jar ../Dinosaur.jar --advParams={os.path.abspath("dinosaur.params")} --concurrency=8 {mzml}', shell = True)
+        
+        #run peptide rollup
+        for name in base_names:
+            peptide_rollup(name, job)
+        
+        #process results
+        process_results(base_names, job)
     
-    
-    #run Dinosaur    
-    with open('dinosaur.params', 'w') as params:
-        params.write('\n'.join(f'{k}={v}' for k,v in job.items() if k in dinosaur_param_set))
-    
-    for mzml in mzmls:
-        subprocess.run(f'java -jar ../Dinosaur.jar --advParams={os.path.abspath("dinosaur.params")} --concurrency=8 {mzml}', shell = True)
-    
-    #run peptide rollup
-    for name in base_names:
-        peptide_rollup(name, job)
-    
-    #process results
-    process_results(base_names, job)
-    
+    except Exception() as e:
+        print(e)
     #clean up temporary files
     os.chdir('..')
     shutil.rmtree(tmpdir)
