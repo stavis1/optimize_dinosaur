@@ -7,7 +7,7 @@
 #SBATCH --nodes=1
 #SBATCH -c 8
 #SBATCH --mem=32g
-#SBATCH -J batch1_searches
+#SBATCH -J genetic_runs
 #SBATCH --output=initial_trials_out_%j_%a.log
 #SBATCH --error=initial_trials_err_%j_%a.log
 #SBATCH --mail-type=ALL
