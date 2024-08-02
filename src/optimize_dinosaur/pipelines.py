@@ -24,6 +24,10 @@ class Pipeline():
     def __init__(self):
         self.name = NotImplemented
         self.cores = NotImplemented
+<<<<<<< HEAD
+=======
+        self.timeout = NotImplemented
+>>>>>>> 133a903 (refactored initialization code to allow tool to make its own slurm array submission for initial trials)
     
     def get_params(self):
         '''
@@ -198,6 +202,10 @@ class DinosaurRunner(FeatureFinderPipeline):
     def __init__(self):
         self.name = 'Dinosaur'
         self.cores = 4
+<<<<<<< HEAD
+=======
+        self.timeout = '01:00:00'
+>>>>>>> 133a903 (refactored initialization code to allow tool to make its own slurm array submission for initial trials)
         self.get_params()
     
     def get_params(self):
