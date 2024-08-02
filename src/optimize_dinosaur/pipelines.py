@@ -59,7 +59,8 @@ class Pipeline():
         the only argument is a dictionary of parameter choices
         runs the pipeline and appends the outcome to outcomes.tsv
         '''
-        raise NotImplementedError()
+        with open('attempted_solutions.tsv', 'a') as tsv:
+            tsv.write('\t'.join(str(v) for v in job.values()) + '\n')
 
 class PepQuantPipeline(Pipeline):
     def get_metrics(self):
@@ -90,7 +91,7 @@ class PepQuantPipeline(Pipeline):
         quants = quants[np.all(np.isfinite(quants), axis = 1)]
         means = np.mean(quants, axis = 1)
         diffs = np.abs(quants[:,0] - quants[:,1])
-        mre = diffs/means
+        mre = np.mean(diffs/means)
 
         return (quant_depth, mre)
     
@@ -102,7 +103,7 @@ class PepQuantPipeline(Pipeline):
 class FeatureFinderPipeline(PepQuantPipeline):
     def map_feature(self, psm_idx):
         feature_set = set([])
-        for charge in range(5):
+        for charge in range(1,6):
             rt = psm_rt[psm_idx]
             mz = psm_mass[psm_idx]/charge + H
             ppm = (mz/1e6)*self.params['ppm']
@@ -189,7 +190,7 @@ class FeatureFinderPipeline(PepQuantPipeline):
             peptide.calculate_intensity(intensity_map)
         
         #make results dataframe
-        peptide_data = pd.DataFrame(np.array([p.report() for p in peptide_list]),
+        peptide_data = pd.DataFrame([p.report() for p in peptide_list],
                                     columns = ('sequence', 'intensity'))
         return peptide_data
 
@@ -197,6 +198,7 @@ class DinosaurRunner(FeatureFinderPipeline):
     def __init__(self):
         self.name = 'Dinosaur'
         self.cores = 4
+        self.get_params()
     
     def get_params(self):
         super().get_params()
@@ -228,12 +230,15 @@ class DinosaurRunner(FeatureFinderPipeline):
                            shell = True)
     
     def run_job(self, job):
+        super().run_job(job)
+        self.set_params(job)
+        
         import os
         import subprocess
         import shutil
         from time import time
 
-        import padas as pd
+        import pandas as pd
         
         #set up temporary workspace
         tmpdir = str(os.getpid())
@@ -252,7 +257,7 @@ class DinosaurRunner(FeatureFinderPipeline):
                 params.write('\n'.join(f'{k}={v}' for k,v in job.items() if k in self.dinosaur_param_set))
             
             for mzml in mzmls:
-                subprocess.run(f'java -jar ../Dinosaur.jar --advParams={os.path.abspath("dinosaur.params")} --concurrency={self.core} {mzml}', shell = True)
+                subprocess.run(f'java -jar ../Dinosaur.jar --advParams={os.path.abspath("dinosaur.params")} --concurrency={self.cores} {mzml}', shell = True)
             
             #run peptide rollup
             peptide_results = []
@@ -261,6 +266,7 @@ class DinosaurRunner(FeatureFinderPipeline):
                 features['rt_start'] = features['rtStart']
                 features['rt_end'] = features['rtEnd']
                 features['mz'] = (features['mass']/features['charge']) + H
+                features['intensity'] = features['intensitySum']/features['charge']
                 features = features[['rt_start', 'rt_end', 'mz', 'intensity']]
                 
                 psms = pd.read_csv(f'{base_name}_PSMs.txt', sep = '\t')
@@ -280,7 +286,7 @@ class DinosaurRunner(FeatureFinderPipeline):
             with open('../outcomes.tsv', 'a') as tsv:
                 tsv.write('\t'.join(str(r) for r in result_line) + '\n')
             
-        except Exception() as e:
+        except Exception as e:
             print(e)
         #clean up temporary files
         os.chdir('..')
