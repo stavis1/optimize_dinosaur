@@ -29,18 +29,10 @@ def make_workspace(target, pipeline):
     jobs.columns = params.keys()
     jobs = jobs.drop_duplicates()   
     jobs.to_csv('initial_trials.tsv', sep = '\t', index = False)
-<<<<<<< HEAD:src/optimize_dinosaur/initialize_workspace.py
-=======
-<<<<<<< Updated upstream:src/optimize_dinosaur/initialize_workspace.py
-=======
->>>>>>> 133a903 (refactored initialization code to allow tool to make its own slurm array submission for initial trials):src/optimize_dinosaur/initial_setup.py
-
+    
     #run pipeline specific setup
     pipeline.setup_workspace()
 
-<<<<<<< HEAD:src/optimize_dinosaur/initialize_workspace.py
-
-=======
 def initial_slurm_array_submission(pipeline):
     import subprocess
     import pandas as pd
@@ -67,6 +59,3 @@ def initial_slurm_array_submission(pipeline):
     command = ' '.join(command)
     
     subprocess.run(command, shell = True)
-
->>>>>>> Stashed changes:src/optimize_dinosaur/initial_setup.py
->>>>>>> 133a903 (refactored initialization code to allow tool to make its own slurm array submission for initial trials):src/optimize_dinosaur/initial_setup.py

@@ -24,19 +24,6 @@ parser.add_argument('-p', '--pipeline', action = 'store', required = True, choic
                     help = 'The pipeline to work on')
 args = parser.parse_args()
 
-<<<<<<< Updated upstream
-from optimize_dinosaur.initialize_workspace import make_workspace
-from optimize_dinosaur.initial_trials import run_initial_job
-from optimize_dinosaur.optimizer_job import run_optimizer_job
-
-pipeline = next(p for p in pipeline_objects if p.name == args.pipeline)
-
-if args.task == 'initialize_workspace':
-<<<<<<< HEAD
-    make_workspace(args.directory, pipeline)
-=======
-    make_workspace(args.directory)
-=======
 from optimize_dinosaur.initial_setup import make_workspace, initial_slurm_array_submission
 from optimize_dinosaur.initial_trials import run_initial_job
 from optimize_dinosaur.optimizer_job import run_optimizer_job
@@ -49,8 +36,6 @@ if args.task == 'initialize_workspace':
 elif args.task == 'initialize':
     make_workspace(args.directory, pipeline)
     initial_slurm_array_submission(pipeline)
->>>>>>> Stashed changes
->>>>>>> 133a903 (refactored initialization code to allow tool to make its own slurm array submission for initial trials)
 
 elif args.task == 'initial_trials':
     run_initial_job(args.index, pipeline)
