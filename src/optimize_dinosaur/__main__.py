@@ -24,8 +24,8 @@ parser.add_argument('-p', '--pipeline', action = 'store', required = True, choic
 args = parser.parse_args()
 
 from optimize_dinosaur.initialize_workspace import make_workspace
-from optimize_dinosaur.initial_trials import run_trial
-from optimize_dinosaur.optimizer_job import run_job
+from optimize_dinosaur.initial_trials import run_initial_job
+from optimize_dinosaur.optimizer_job import run_optimizer_job
 
 pipeline = next(p for p in pipeline_objects if p.name == args.pipeline)
 
@@ -33,8 +33,8 @@ if args.task == 'initialize_workspace':
     make_workspace(args.directory, pipeline)
 
 elif args.task == 'initial_trials':
-    run_trial(args.index, pipeline)
+    run_initial_job(args.index, pipeline)
 
 elif args.task == 'genetic_optimization':
-    run_job(args.index, pipeline)
+    run_optimizer_job(args.index, pipeline)
 

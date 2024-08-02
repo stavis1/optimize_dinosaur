@@ -6,13 +6,11 @@ Created on Tue Jul 30 15:25:11 2024
 @author: 4vt
 """
 
-def run_trial(sarray_i):
+def run_initial_job(sarray_i, pipeline):
     import pandas as pd
 
-    from optimize_dinosaur.processing_tools import run_job
-    
     jobs = pd.read_csv('initial_trials.tsv', sep = '\t')
     job = {col:param for col,param in zip(jobs.columns, jobs.iloc[sarray_i,:])}
-    run_job(job)
+    pipeline.run_job(job)
     
  

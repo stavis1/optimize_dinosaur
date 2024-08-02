@@ -61,7 +61,45 @@ class Pipeline():
         '''
         raise NotImplementedError()
 
-class FeatureFinderPipeline(Pipeline):
+class PepQuantPipeline(Pipeline):
+    def get_metrics(self):
+        return {'quant_depth':1,
+                'mean_relative_error':-1}
+
+    def calc_metrics(self, quant1, quant2):
+        '''
+        arguments:
+            takes two dataframes that are the output of self.peptide_rollup()
+        returns:
+            (quant_depth, mean_relative_error)
+        '''
+        from collections import defaultdict
+        import numpy as np
+        
+        #build array of intensity values
+        quants = defaultdict(lambda:[np.nan]*2)
+        for i,table in enumerate((quant1, quant2)):
+            for sequence, intensity in zip(table['sequence'], table['intensity']):
+                quants[sequence][i] = intensity
+        quants = np.array(list(quants.values()))
+        
+        #calculate the number of quantified peptides
+        quant_depth = np.sum(np.isfinite(quants))
+        
+        #calculate mean relative error
+        quants = quants[np.all(np.isfinite(quants), axis = 1)]
+        means = np.mean(quants, axis = 1)
+        diffs = np.abs(quants[:,0] - quants[:,1])
+        mre = diffs/means
+
+        return (quant_depth, mre)
+    
+    def get_params(self):
+        self.param_choices = {'ppm':[5, 2, 8, 10, 15, 20],
+                              'rt_wiggle':[0, 0.01, 0.05, 0.1,]}
+        self.pep_rollup_param_set = set(self.param_choices.keys())
+
+class FeatureFinderPipeline(PepQuantPipeline):
     def map_feature(self, psm_idx):
         feature_set = set([])
         for charge in range(5):
@@ -154,43 +192,6 @@ class FeatureFinderPipeline(Pipeline):
         peptide_data = pd.DataFrame(np.array([p.report() for p in peptide_list]),
                                     columns = ('sequence', 'intensity'))
         return peptide_data
-
-    def get_metrics(self):
-        return {'quant_depth':1,
-                'mean_relative_error':-1}
-
-    def calc_metrics(self, quant1, quant2):
-        '''
-        arguments:
-            takes two dataframes that are the output of self.peptide_rollup()
-        returns:
-            (quant_depth, mean_relative_error)
-        '''
-        from collections import defaultdict
-        import numpy as np
-        
-        #build array of intensity values
-        quants = defaultdict(lambda:[np.nan]*2)
-        for i,table in enumerate((quant1, quant2)):
-            for sequence, intensity in zip(table['sequence'], table['intensity']):
-                quants[sequence][i] = intensity
-        quants = np.array(list(quants.values()))
-        
-        #calculate the number of quantified peptides
-        quant_depth = np.sum(np.isfinite(quants))
-        
-        #calculate mean relative error
-        quants = quants[np.all(np.isfinite(quants), axis = 1)]
-        means = np.mean(quants, axis = 1)
-        diffs = np.abs(quants[:,0] - quants[:,1])
-        mre = diffs/means
-
-        return (quant_depth, mre)
-    
-    def get_params(self):
-        self.param_choices = {'ppm':[5, 2, 8, 10, 15, 20],
-                              'rt_wiggle':[0, 0.01, 0.05, 0.1,]}
-        self.pep_rollup_param_set = set(self.param_choices.keys())
 
 class DinosaurRunner(FeatureFinderPipeline):
     def __init__(self):

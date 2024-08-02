@@ -6,41 +6,40 @@ Created on Tue Jul 30 14:24:48 2024
 @author: 4vt
 """
 
-def breeding_population(outcomes):
+def breeding_population(outcomes, pipeline):
     from sortedcontainers import SortedList
+    metric1, metric2 = pipeline.get_metrics().items()
     
-    depth_index = SortedList(zip(outcomes['quant_depth'], outcomes.index))
-    mre_index = SortedList(zip(outcomes['mean_relative_error'], outcomes.index), key = lambda x: -x[0])
+    m1_index = SortedList(zip(outcomes[metric1[0]], outcomes.index), key = lambda x: x[0]*metric1[1])
+    m2_index = SortedList(zip(outcomes[metric2[0]], outcomes.index), key = lambda x: x[0]*metric2[1])
     
     breeding_pop = []
-    for i, depth, mre in zip(outcomes.index, 
-                             outcomes['quant_depth'], 
-                             outcomes['mean_relative_error']):
-        depth_dominated = depth_index[depth_index.bisect_right((depth,)):]
-        if depth_dominated:
-            depth_dominated = set(o[1] for o in depth_dominated) if type(depth_dominated[0]) == tuple else set([depth_dominated[1]])
+    for i, m1, m2 in zip(outcomes.index, 
+                             outcomes[metric1[0]], 
+                             outcomes[metric2[0]]):
+        m1_dominated = m1_index[m1_index.bisect_right((m1,)):]
+        if m1_dominated:
+            m1_dominated = set(o[1] for o in m1_dominated) if type(m1_dominated[0]) == tuple else set([m1_dominated[1]])
         else:
-            depth_dominated = set([])
-        mre_dominated = mre_index[mre_index.bisect_right((mre,)):]
-        if mre_dominated:
-            mre_dominated = set(o[1] for o in mre_dominated) if type(mre_dominated[0]) == tuple else set([mre_dominated[1]])
+            m1_dominated = set([])
+        m2_dominated = m2_index[m2_index.bisect_right((m2,)):]
+        if m2_dominated:
+            m2_dominated = set(o[1] for o in m2_dominated) if type(m2_dominated[0]) == tuple else set([m2_dominated[1]])
         else:
-            mre_dominated = set([])
-        if len(depth_dominated.intersection(mre_dominated)) <= 1:
+            m2_dominated = set([])
+        if len(m1_dominated.intersection(m2_dominated)) <= 1:
             breeding_pop.append(i)
     
     return breeding_pop
 
-def run_job(sarry_i):
+def run_optimizer_job(sarry_i, pipeline):
     import os
     
     import pandas as pd
     import numpy as np
     
-    from optimize_dinosaur.shared_data import params
-    from optimize_dinosaur.processing_tools import run_job
-    
     rng = np.random.default_rng(os.getpid())
+    params = pipeline.get_params()
     
     #read finished run data and attempted solutions
     attempts = pd.read_csv('attempted_solutions.tsv', sep = '\t')
@@ -48,8 +47,8 @@ def run_job(sarry_i):
     
     outcomes = pd.read_csv('outcomes.tsv', sep = '\t')
         
-    #find breeding populaiton
-    breeding_pop = breeding_population(outcomes)
+    #find breeding population
+    breeding_pop = breeding_population(outcomes, pipeline)
     
     #select parents
     p1, p2 = rng.choice(breeding_pop, 2, replace = False)
@@ -64,12 +63,13 @@ def run_job(sarry_i):
     for k in new_params.keys():
         if type(new_params[k]) != str:
             new_params[k] = new_params[k].item()
-
+            
+    #muatate to ensure solution uniqueness
     while tuple(new_params.values()) in attempts:
         mutate_param = str(rng.choice(list(params.keys()), 1)[0])
         new_params[mutate_param] = rng.choice(params[mutate_param], 1)[0].item()
 
     #run job
-    run_job(new_params)
+    pipeline.run_job(new_params)
 
 
