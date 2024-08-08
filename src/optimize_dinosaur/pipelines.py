@@ -8,8 +8,6 @@ Created on Thu Aug  8 17:11:13 2024
 
 from optimize_dinosaur import pipeline_tools
 
-H = 1.007276
-
 class Dinosaur(pipeline_tools.FeatureFinderPipeline):
     def __init__(self):
         self.name = 'Dinosaur'
@@ -82,12 +80,12 @@ class Dinosaur(pipeline_tools.FeatureFinderPipeline):
                 features = pd.read_csv(f'{base_name}.features.tsv', sep = '\t')
                 features['rt_start'] = features['rtStart']
                 features['rt_end'] = features['rtEnd']
-                features['mz'] = (features['mass']/features['charge']) + H
+                features['mz'] = (features['mass']/features['charge']) + pipeline_tools.H
                 features['intensity'] = features['intensitySum']/features['charge']
                 features = features[['rt_start', 'rt_end', 'mz', 'intensity']]
                 
                 psms = pd.read_csv(f'{base_name}_PSMs.txt', sep = '\t')
-                psms['mass'] = psms['Theo. MH+ [Da]'] - H
+                psms['mass'] = psms['Theo. MH+ [Da]'] - pipeline_tools.H
                 psms['rt'] = psms['RT [min]']
                 psms['sequence'] = psms['Annotated Sequence']
                 psms = psms[['mass', 'rt', 'sequence']]
@@ -108,3 +106,25 @@ class Dinosaur(pipeline_tools.FeatureFinderPipeline):
         #clean up temporary files
         os.chdir('..')
         shutil.rmtree(tmpdir)
+
+
+class Asari(pipeline_tools.FeatureFinderPipeline):
+    def __init__(self):
+        self.name = 'Asari'
+        self.cores = 4
+        self.timeout = '01:00:00'
+        self.get_params()
+
+    def get_params(self):
+        super().get_params()
+
+    def setup_workspace(self):
+        import subprocess
+        subprocess.run('conda create -y -n asari_env "python=3.12.5" pip', shell = True)
+        subprocess.run('conda run -n asari_env pip install "asari-metabolomics==1.13.1"', shell = True)
+
+    def run_job(self, job):
+        pass
+    
+    
+    

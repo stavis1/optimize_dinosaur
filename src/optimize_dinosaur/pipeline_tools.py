@@ -7,6 +7,8 @@ Created on Thu Aug  1 15:45:57 2024
 """
 from collections import defaultdict
 
+H = 1.007276
+
 class keydefaultdict(defaultdict):
     '''
     subclass of defaultdict that passes the key to the first
@@ -94,13 +96,14 @@ class PepQuantPipeline(Pipeline):
         mre = np.mean(diffs/means)
 
         return (quant_depth, mre)
-    
+
+
+class FeatureFinderPipeline(PepQuantPipeline):    
     def get_params(self):
         self.param_choices = {'ppm':[5, 2, 8, 10, 15, 20],
                               'rt_wiggle':[0, 0.01, 0.05, 0.1,]}
         self.pep_rollup_param_set = set(self.param_choices.keys())
-
-class FeatureFinderPipeline(PepQuantPipeline):
+        
     def map_feature(self, psm_idx):
         feature_set = set([])
         for charge in range(1,6):
