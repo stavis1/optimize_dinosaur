@@ -19,11 +19,12 @@ parser.add_argument('-t', '--task', action = 'store', choices = ['initialize',
                     help = 'Which task to perform')
 parser.add_argument('-i', '--index', action = 'store', type = int, required = False, default = -1,
                     help = 'The slurm array index')
-parser.add_argument('-d', '--directory', action = 'store', required = False, default = False,
-                    help = 'The directory to initialize')
+parser.add_argument('-d', '--directory', action = 'store', required = True,
+                    help = 'The directory containing input data')
 parser.add_argument('-p', '--pipeline', action = 'store', required = True, choices = [p.name for p in pipeline_objects],
                     help = 'The pipeline to work on')
 args = parser.parse_args()
+import os
 
 from optimize_dinosaur.initial_setup import make_workspace, initial_slurm_array_submission
 from optimize_dinosaur.initial_trials import run_initial_job
@@ -42,5 +43,9 @@ elif args.task == 'initial_trials':
     run_initial_job(args.index, pipeline)
 
 elif args.task == 'genetic_optimization':
+    if os.path.split(args.directory)[-1] == f'{pipeline.name}_optimization':
+        print('It looks like you passed a results directory to --directory, please always use the same argument to --directory',
+              flush = True)
+    os.chdir(os.path.join(args.directory, f'{pipeline.name}_optimization'))
     run_optimizer_job(args.index, pipeline)
 
