@@ -7,7 +7,8 @@ Created on Tue Jul 30 16:42:32 2024
 """
 
 from optimize_dinosaur import pipelines
-pipeline_objects = [p[1]() for p in pipelines.__dict__.items() if p[0].endswith('Runner')]
+pipemethods = ('get_params', 'set_params', 'get_metrics', 'setup_workspace', 'run_job')
+pipeline_objects = [p() for p in pipelines.__dict__.values() if all(hasattr(p, n) for n in pipemethods)]
 
 import argparse
 parser = argparse.ArgumentParser()
