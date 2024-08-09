@@ -65,7 +65,7 @@ def initial_slurm_array_submission(pipeline):
                '--nodes=1',
                f'-c {pipeline.cores}',
                f'--mem={pipeline.memory}g',
-               f'-J {pipeline.name}'
+               f'-J {pipeline.name}',
                f'--output=out_{pipeline.name}_%j_%a.log',
                f'--error=err_{pipeline.name}_%j_%a.log',
                '--mail-type=ALL',
