@@ -50,7 +50,7 @@ def initial_slurm_array_submission(pipeline):
     trials = pd.read_csv('initial_trials.tsv', sep = '\t')    
     
     with open('init_run_script.sbatch', 'w') as sbatch:
-        sbatch.write('!#/bin/bash\n')
+        sbatch.write('#!/bin/bash\n')
         sbatch.write(' '.join(['python -m optimize_dinosaur',
                                '-t initial_trials',
                                f'-d {os.getcwd()}',
