@@ -17,9 +17,9 @@ def make_workspace(target, pipeline):
     os.mkdir(temp_dir)
     os.chdir(temp_dir)
     for mzml in mzmls:
-        os.link(f'../{mzml}', './')
+        os.link(f'../{mzml}', '.')
     for psm in psms:
-        os.link(f'../{psm}', './')
+        os.link(f'../{psm}', '.')
     params = pipeline.get_params()
     
     #set up results files
