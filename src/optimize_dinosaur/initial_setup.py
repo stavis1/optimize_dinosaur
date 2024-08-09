@@ -44,9 +44,19 @@ def make_workspace(target, pipeline):
 
 def initial_slurm_array_submission(pipeline):
     import subprocess
+    import os
     import pandas as pd
 
     trials = pd.read_csv('initial_trials.tsv', sep = '\t')    
+    
+    with open('init_run_script.sbatch', 'w') as sbatch:
+        sbatch.write('!#/bin/bash\n')
+        sbatch.write(' '.join(['python -m optimize_dinosaur',
+                               '-t initial_trials',
+                               f'-d {os.getcwd()}',
+                               f'-p {pipeline.name}',
+                               '-i $SLURM_ARRAY_TASK_ID']))
+    
     command = ['sbatch',
                '-A ACF-UTK0011',
                '-p campus',
@@ -61,10 +71,7 @@ def initial_slurm_array_submission(pipeline):
                '--mail-type=ALL',
                '--mail-user=stavis@vols.utk.edu',
                f'--array=0-{trials.shape[0]-1}',
-               'python -m optimize_dinosaur',
-               '-t initial_trials',
-               f'-p {pipeline.name}',
-               '-i $SLURM_ARRAY_TASK_ID']
+               'init_run_script.sbatch']
     command = ' '.join(command)
     
     subprocess.run(command, shell = True)
