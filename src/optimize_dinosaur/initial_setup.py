@@ -17,9 +17,9 @@ def make_workspace(target, pipeline):
     os.mkdir(temp_dir)
     os.chdir(temp_dir)
     for mzml in mzmls:
-        os.link(f'../{mzml}', '.')
+        os.link(f'../{mzml}', mzml)
     for psm in psms:
-        os.link(f'../{psm}', '.')
+        os.link(f'../{psm}', psm)
     params = pipeline.get_params()
     
     #set up results files
@@ -54,13 +54,13 @@ def initial_slurm_array_submission(pipeline):
                f'-t {pipeline.timeout}',
                '--nodes=1',
                f'-c {pipeline.cores}',
-               f'--mem={4*pipeline.cores}g',
+               f'--mem={pipeline.memory}g',
                f'-J {pipeline.name}'
                f'--output=out_{pipeline.name}_%j_%a.log',
                f'--error=err_{pipeline.name}_%j_%a.log',
                '--mail-type=ALL',
                '--mail-user=stavis@vols.utk.edu',
-               f'--array=0-{trials.shape[0]-1}'
+               f'--array=0-{trials.shape[0]-1}',
                'python -m optimize_dinosaur',
                '-t initial_trials',
                f'-p {pipeline.name}',

@@ -40,6 +40,10 @@ elif args.task == 'initialize':
     initial_slurm_array_submission(pipeline)
 
 elif args.task == 'initial_trials':
+    if os.path.split(args.directory)[-1] == f'{pipeline.name}_optimization':
+        print('It looks like you passed a results directory to --directory, please always use the same argument to --directory',
+              flush = True)
+    os.chdir(os.path.join(args.directory, f'{pipeline.name}_optimization'))
     run_initial_job(args.index, pipeline)
 
 elif args.task == 'genetic_optimization':

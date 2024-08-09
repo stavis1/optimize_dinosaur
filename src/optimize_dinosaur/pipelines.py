@@ -12,6 +12,7 @@ class Dinosaur(pipeline_tools.FeatureFinderPipeline):
     def __init__(self):
         self.name = 'Dinosaur'
         self.cores = 4
+        self.memory = self.cores*4
         self.timeout = '01:00:00'
         self.get_params()
     
@@ -110,7 +111,8 @@ class Dinosaur(pipeline_tools.FeatureFinderPipeline):
 class Asari(pipeline_tools.FeatureFinderPipeline):
     def __init__(self):
         self.name = 'Asari'
-        self.cores = 4
+        self.cores = 1
+        self.memory = 95
         self.timeout = '01:00:00'
         self.get_params()
 
