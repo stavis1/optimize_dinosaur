@@ -157,12 +157,61 @@ class Asari(pipeline_tools.FeatureFinderPipeline):
         super().run_job(job)
         
         import subprocess
+        from time import time
+        import os
+        import pandas as pd
+        import shutil
         
-        with open('asari.params', 'w') as yaml:
-            for param, value in self.run_params.items():
-                yaml.write(f'{param}: {value}\n')
-            for param in self.asari_param_set:
-                yaml.write(f'{param}: {self.params[param]}\n')
+        #set up temporary workspace
+        tmpdir = str(os.getpid())
+        os.mkdir(tmpdir)
+        mzmls = [f for f in os.listdir() if f.endswith('.mzML')]
+        base_names = [f[:-5] for f in mzmls]
+        psms = [f for f in os.listdir() if f.endswith('_PSMs.txt')]
+        os.chdir(tmpdir)
+        try:
+            for file in mzmls + psms:
+                os.link(f'../{file}', file)
+                
+            with open('asari.params', 'w') as yaml:
+                for param, value in self.run_params.items():
+                    yaml.write(f'{param}: {value}\n')
+                for param in self.asari_param_set:
+                    yaml.write(f'{param}: {self.params[param]}\n')
+            
+            start = time()
+            subprocess.run('conda run -n asari_env asari process -p asari.params -i ./', shell = True)
+            
+            #run peptide rollup
+            peptide_results = []
+            outdir = next(f for f in os.listdir() if f.startswith('output_'))
+            features = pd.read_csv(os.path.join(outdir,'export/full_Feature_table.tsv'), sep = '\t')
+            features = features[['rtim_left_base', 'rtime_right_base', 'mz'] + base_names]
+            features.columns = ['rt_start', 'rt_end', 'mz'] + base_names
+            for base_name in base_names:
+                feature_subset = features[features[base_name] > 0]
+                feature_subset['intensity'] = feature_subset[base_name]
+                
+                psms = pd.read_csv(f'{base_name}_PSMs.txt', sep = '\t')
+                psms['mass'] = psms['Theo. MH+ [Da]'] - pipeline_tools.H
+                psms['rt'] = psms['RT [min]']
+                psms['sequence'] = psms['Annotated Sequence']
+                psms = psms[['mass', 'rt', 'sequence']]
+                
+                peptide_results.append(self.peptide_rollup(feature_subset, psms))
+            end = time()
         
-        subprocess.run('conda run -n asari_env asari process -p asari.params -i ./', shell = True)
-    
+            #process results
+            quant_depth, mre = self.calc_metrics(peptide_results[0], peptide_results[1])
+            runtime = end - start
+            
+            result_line = list(job.values()) + [quant_depth, mre, runtime]
+            with open('../outcomes.tsv', 'a') as tsv:
+                tsv.write('\t'.join(str(r) for r in result_line) + '\n')
+            
+        except Exception as e:
+            print(e)
+        #clean up temporary files
+        os.chdir('..')
+        shutil.rmtree(tmpdir)
+        
