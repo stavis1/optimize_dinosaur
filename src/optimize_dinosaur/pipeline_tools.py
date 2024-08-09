@@ -63,6 +63,7 @@ class Pipeline():
         '''
         with open('attempted_solutions.tsv', 'a') as tsv:
             tsv.write('\t'.join(str(v) for v in job.values()) + '\n')
+        self.set_params(job)
 
 class PepQuantPipeline(Pipeline):
     def get_metrics(self):
