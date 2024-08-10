@@ -42,7 +42,7 @@ def make_workspace(target, pipeline):
     #run pipeline specific setup
     pipeline.setup_workspace()
 
-def initial_slurm_array_submission(pipeline):
+def initial_slurm_array_submission(target, pipeline):
     import subprocess
     import os
     import pandas as pd

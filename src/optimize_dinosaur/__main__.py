@@ -37,7 +37,7 @@ if args.task == 'initialize_workspace':
     
 elif args.task == 'initialize':
     make_workspace(args.directory, pipeline)
-    initial_slurm_array_submission(pipeline)
+    initial_slurm_array_submission(args.directory, pipeline)
 
 elif args.task == 'initial_trials':
     if os.path.split(args.directory)[-1] == f'{pipeline.name}_optimization':
