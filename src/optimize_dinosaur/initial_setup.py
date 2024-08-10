@@ -53,7 +53,7 @@ def initial_slurm_array_submission(pipeline):
         sbatch.write('#!/bin/bash\n')
         sbatch.write(' '.join(['python -m optimize_dinosaur',
                                '-t initial_trials',
-                               f'-d {os.getcwd()}',
+                               f'-d {target}',
                                f'-p {pipeline.name}',
                                '-i $SLURM_ARRAY_TASK_ID']))
     
