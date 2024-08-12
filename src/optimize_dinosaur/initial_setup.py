@@ -44,7 +44,6 @@ def make_workspace(target, pipeline):
 
 def initial_slurm_array_submission(target, pipeline):
     import subprocess
-    import os
     import pandas as pd
 
     trials = pd.read_csv('initial_trials.tsv', sep = '\t')    

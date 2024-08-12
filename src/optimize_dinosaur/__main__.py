@@ -25,6 +25,7 @@ parser.add_argument('-p', '--pipeline', action = 'store', required = True, choic
                     help = 'The pipeline to work on')
 args = parser.parse_args()
 import os
+args.directory = os.path.abspath(args.directory)
 
 from optimize_dinosaur.initial_setup import make_workspace, initial_slurm_array_submission
 from optimize_dinosaur.initial_trials import run_initial_job
