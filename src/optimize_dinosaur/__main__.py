@@ -13,11 +13,10 @@ pipeline_objects = [p() for p in pipelines.__dict__.values() if all(hasattr(p, n
 import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument('-t', '--task', action = 'store', choices = ['initialize',
-                                                                 'initialize_workspace',
-                                                                 'genetic_optimization',
+                                                                 'optimize',
                                                                  'initial_job',
                                                                  'genetic_job'],
-                    help = 'Which task to perform')
+                    help = 'Which task to perform, you should only ever directly call initialize or optimize')
 parser.add_argument('-i', '--index', action = 'store', type = int, required = False, default = -1,
                     help = 'The slurm array index')
 parser.add_argument('-d', '--directory', action = 'store', required = True,
@@ -36,10 +35,7 @@ from optimize_dinosaur.optimizer_job import run_optimizer_job, genetic_slurm_arr
 
 pipeline = next(p for p in pipeline_objects if p.name == args.pipeline)
 
-if args.task == 'initialize_workspace':
-    make_workspace(args.directory, pipeline)
-    
-elif args.task == 'initialize':
+if args.task == 'initialize':
     make_workspace(args.directory, pipeline)
     initial_slurm_array_submission(args.directory, pipeline)
 
@@ -49,7 +45,7 @@ else:
               flush = True)
     os.chdir(os.path.join(args.directory, f'{pipeline.name}_optimization'))
     
-    if args.task == 'genetic_optimization':
+    if args.task == 'optimize':
         genetic_slurm_array_submission(pipeline, args.directory, args.N_jobs)
     
     elif args.task == 'initial_job':
