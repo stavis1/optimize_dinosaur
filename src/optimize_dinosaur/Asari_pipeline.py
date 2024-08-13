@@ -13,7 +13,7 @@ class Asari(pipeline_tools.FeatureFinderPipeline):
         self.name = 'Asari'
         self.cores = 1
         self.memory = 95
-        self.timeout = '01:00:00'
+        self.timeout = '03:00:00'
         self.get_params()
 
     def get_params(self):
