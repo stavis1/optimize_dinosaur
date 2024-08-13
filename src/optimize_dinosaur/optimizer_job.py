@@ -73,3 +73,29 @@ def run_optimizer_job(sarry_i, pipeline):
     pipeline.run_job(new_params)
 
 
+def genetic_slurm_array_submission(pipeline, target, N):
+    import subprocess
+
+    with open('init_run_script.sbatch', 'w') as sbatch:
+        sbatch.write('\n'.join(['#!/bin/bash',
+                                '#SBATCH -A ACF-UTK0011',
+                                '#SBATCH -p campus',
+                                '#SBATCH --qos=campus',
+                                f'#SBATCH -t {pipeline.timeout}',
+                                '#SBATCH --nodes=1',
+                                f'#SBATCH -c {pipeline.cores}',
+                                f'#SBATCH --mem={pipeline.memory}g',
+                                f'#SBATCH -J {pipeline.name}',
+                                f'#SBATCH --output=out_{pipeline.name}_%j_%a.log',
+                                f'#SBATCH --error=err_{pipeline.name}_%j_%a.log',
+                                '#SBATCH --mail-type=ALL',
+                                '#SBATCH --mail-user=stavis@vols.utk.edu',
+                                f'#SBATCH --array=0-{N-1}\n',]))
+        sbatch.write(' '.join(['python -m optimize_dinosaur',
+                               '-t genetic_job',
+                               f'-d {target}',
+                               f'-p {pipeline.name}',
+                               '-i $SLURM_ARRAY_TASK_ID']))
+    
+    subprocess.run('sbatch init_run_script.sbatch', shell = True)
+
