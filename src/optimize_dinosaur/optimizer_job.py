@@ -76,7 +76,7 @@ def run_optimizer_job(sarry_i, pipeline):
 def genetic_slurm_array_submission(pipeline, target, N):
     import subprocess
 
-    with open('init_run_script.sbatch', 'w') as sbatch:
+    with open('genetic_run_script.sbatch', 'w') as sbatch:
         sbatch.write('\n'.join(['#!/bin/bash',
                                 '#SBATCH -A ACF-UTK0011',
                                 '#SBATCH -p campus',
@@ -97,5 +97,5 @@ def genetic_slurm_array_submission(pipeline, target, N):
                                f'-p {pipeline.name}',
                                '-i $SLURM_ARRAY_TASK_ID']))
     
-    subprocess.run('sbatch init_run_script.sbatch', shell = True)
+    subprocess.run('sbatch genetic_run_script.sbatch', shell = True)
 
