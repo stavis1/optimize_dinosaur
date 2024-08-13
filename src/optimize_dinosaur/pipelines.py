@@ -122,7 +122,7 @@ class Asari(pipeline_tools.FeatureFinderPipeline):
                            'project_name': 'asari_optimization',
                            'multicores': self.cores,
                            'outdir': 'output',
-                           'reference': 'null',
+                           # 'reference': 'null',
                            'database_mode': 'ondisk'}
         
         asari_params = {'mz_tolerance_ppm': [5, 4, 8, 10, 15],              # ppm, high selectivity meaning no overlap neighbors to confuse; 
@@ -148,6 +148,24 @@ class Asari(pipeline_tools.FeatureFinderPipeline):
                         'num_lowess_iterations': [3,1]}
         self.asari_param_set = set(asari_params.keys())
         self.param_choices.update(asari_params)
+        
+        self.asari_param_dtypes = {'mz_tolerance_ppm': 'int',
+                                   'min_timepoints': 'int',
+                                   'signal_noise_ratio': 'float',
+                                   'min_intensity_threshold': 'float',
+                                   'min_peak_height': 'float',
+                                   'min_peak_ratio': 'float',
+                                   'wlen': 'int',
+                                   'autoheight': 'bool',
+                                   'gaussian_shape': 'float',
+                                   'peak_area': 'str',
+                                   'rt_align_method': 'str',
+                                   'rt_align_on': 'bool',
+                                   'rtime_tolerance': 'float',
+                                   'cal_min_peak_height': 'float',
+                                   'max_retention_shift': 'float',
+                                   'num_lowess_iterations': 'int'}
+        
         return self.param_choices
 
     def setup_workspace(self):
@@ -179,7 +197,8 @@ class Asari(pipeline_tools.FeatureFinderPipeline):
                 for param, value in self.run_params.items():
                     yaml.write(f'{param}: {value}\n')
                 for param in self.asari_param_set:
-                    yaml.write(f'{param}: {self.params[param]}\n')
+                    if not self.params[param] == 'null':
+                        yaml.write(f'{param}: !!{self.asari_param_dtypes[param]} {self.params[param]}\n')
             
             start = time()
             subprocess.run('conda run -n asari_env asari process -p asari.params -i ./', shell = True)
@@ -215,5 +234,5 @@ class Asari(pipeline_tools.FeatureFinderPipeline):
             print(e)
         #clean up temporary files
         os.chdir('..')
-        shutil.rmtree(tmpdir)
+        # shutil.rmtree(tmpdir)
         
