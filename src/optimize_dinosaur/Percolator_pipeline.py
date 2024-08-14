@@ -41,7 +41,7 @@ class Percolator(pipeline_tools.Pipeline):
         subprocess.run('git clone https://github.com/stavis1/proteomics_cluster_submission', shell = True)
         os.chdir('proteomics_cluster_submission/exes/')
         subprocess.run('wget https://github.com/percolator/percolator/releases/download/rel-3-06-05/percolator-noxml-v3-06-linux-amd64.deb', shell = True)
-        subprocess.run('singularity build --fakeroot percolator.def', shell = True)
+        subprocess.run('singularity build --fakeroot percolator.sif percolator.def', shell = True)
         shutil.move('percolator.sif', '../../')
         os.chdir('../../')
         shutil.rmtree('proteomics_cluster_submission')
