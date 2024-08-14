@@ -15,8 +15,8 @@ def breeding_population(outcomes, pipeline):
     
     breeding_pop = []
     for i, m1, m2 in zip(outcomes.index, 
-                             outcomes[metric1[0]], 
-                             outcomes[metric2[0]]):
+                         outcomes[metric1[0]], 
+                         outcomes[metric2[0]]):
         m1_dominated = m1_index[m1_index.bisect_right((m1,)):]
         if m1_dominated:
             m1_dominated = set(o[1] for o in m1_dominated) if type(m1_dominated[0]) == tuple else set([m1_dominated[1]])
