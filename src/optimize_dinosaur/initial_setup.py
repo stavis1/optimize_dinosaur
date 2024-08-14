@@ -12,14 +12,11 @@ def make_workspace(target, pipeline):
 
     os.chdir(target)
     temp_dir = f'{pipeline.name}_optimization'
-    mzmls = [f for f in os.listdir() if f.lower().endswith('.mzml')]
-    psms = [f for f in os.listdir() if f.endswith('_PSMs.txt')]
+    files = [f for f in os.listdir() if os.path.isfile(f)]
     os.mkdir(temp_dir)
     os.chdir(temp_dir)
-    for mzml in mzmls:
-        os.link(f'../{mzml}', mzml)
-    for psm in psms:
-        os.link(f'../{psm}', psm)
+    for file in files:
+        os.link(f'../{file}', file)
     params = pipeline.get_params()
     
     #set up results files
