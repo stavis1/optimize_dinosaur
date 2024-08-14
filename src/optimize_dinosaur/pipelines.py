@@ -9,4 +9,5 @@ Created on Thu Aug  8 17:11:13 2024
 from optimize_dinosaur.Dinosaur_pipeline import Dinosaur
 from optimize_dinosaur.Asari_pipeline import Asari
 from optimize_dinosaur.Osfd_pipeline import Osfd
+from optimize_dinosaur.Percolator_pipeline import Percolator
 
