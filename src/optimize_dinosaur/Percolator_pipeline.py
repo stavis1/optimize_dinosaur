@@ -48,6 +48,7 @@ class Percolator(pipeline_tools.Pipeline):
         
         #download comet
         subprocess.run('wget https://github.com/UWPR/Comet/releases/download/v2024.01.1/comet.linux.exe', shell = True)
+        subprocess.run('chmod +x comet.linux.exe', shell = True)
         
         #run comet jobs
         for search_type in [1,2]:
@@ -92,9 +93,9 @@ class Percolator(pipeline_tools.Pipeline):
             command = f'singularity run {singularity_params} percolator.sif percolator {perc_params} {job_params}'
             print(command)
             
-            start = time()
+            start = time.time()
             subprocess.run(command, shell = True)
-            end = time()
+            end = time.time()
             
             #parse results
             psms = pd.read_csv('results.pout')
