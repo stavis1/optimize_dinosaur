@@ -26,6 +26,7 @@ class Pipeline():
         self.name = NotImplemented
         self.cores = NotImplemented
         self.timeout = NotImplemented
+        self.memory = NotImplemented
     
     def get_params(self):
         '''
