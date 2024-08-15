@@ -105,7 +105,7 @@ class Percolator(pipeline_tools.Pipeline):
             end = time.time()
             
             #parse results
-            psms = pd.read_csv('results.pout')
+            psms = pd.read_csv('results.pout', sep = '\t')
             psms = psms[psms['q-value'] < 0.01]
             psms['fp'] = [all('ecoli' in p for p in ps.split(';')) for ps in psms['proteinIds']]
             fp = np.sum(psms['fp'])*16.6
