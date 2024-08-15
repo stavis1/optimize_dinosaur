@@ -90,7 +90,7 @@ class Percolator(pipeline_tools.Pipeline):
             #run percolator
             singularity_params = '--fakeroot --containall --bind ./:/data/ -w --unsquash'
             perc_params = '-U -m /data/results.pout'
-            job_params = ' '.join(f'--{k} {v}' if type(v) != bool else f'--{k}' for k,v in job.items() if v)
+            job_params = ' '.join(f'--{k} {v}' if v != 'True' else f'--{k}' for k,v in job.items() if v != 'False')
             job_params = re.sub(r'--tab-in ', '', job_params)
             command = f'singularity run {singularity_params} percolator.sif percolator {perc_params} {job_params}'
             print(command)
