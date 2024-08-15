@@ -16,15 +16,20 @@ class Percolator(pipeline_tools.Pipeline):
         self.memory = 12
 
     def get_params(self):
-        choices = {'default-direction':['lnrSp','-deltLCn','-deltCn','-lnExpect','-Xcorr','Sp','-IonFrac','Mass',
-                                        '-PepLen','-enzN','-enzC','-enzInt','lnNumSP','-dM','absdM'],
+        scores = ['lnrSp','deltLCn','deltCn','lnExpect','Xcorr','Sp','IonFrac','Mass',
+                  'PepLen','enzN','enzC','enzInt','lnNumSP','dM','absdM']
+        scores += [f'-{s}' for s in scores]
+        choices = {'default-direction':scores,
                    'testFDR':[0.01, 0.001, 0.05],
                    'trainFDR':[0.01, 0.001, 0.05],
                    'maxiter':[10,5,15,20],
                    'init-weights':[False, 'weights.tsv'],
                    'unitnorm':[False, True],
                    'nested-xval-bins':[1,3,5],
-                   'tab-in':['/data/S1_N1.pin', '/data/S1_N5.pin', '/data/S2_N1.pin', '/data/S2_N5.pin']}
+                   'tab-in':['-y /data/S1_N1.pin', 
+                             '-y /data/S1_N5.pin', 
+                             '-Y /data/S2_N1.pin', 
+                             '-Y /data/S2_N5.pin']}
         return choices
     
     def get_metrics(self):
