@@ -42,10 +42,10 @@ def run_optimizer_job(sarry_i, pipeline):
     params = pipeline.get_params()
     
     #read finished run data and attempted solutions
-    attempts = pd.read_csv('attempted_solutions.tsv', sep = '\t')
+    attempts = pd.read_csv('attempted_solutions.tsv', sep = '\t', dtype = str, keep_default_na=False)
     attempts = set(zip(*[attempts[c] for c in attempts.columns]))
     
-    outcomes = pd.read_csv('outcomes.tsv', sep = '\t')
+    outcomes = pd.read_csv('outcomes.tsv', sep = '\t', sep = '\t', dtype = str, keep_default_na=False)
         
     #find breeding population
     breeding_pop = breeding_population(outcomes, pipeline)
