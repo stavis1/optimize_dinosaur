@@ -41,8 +41,8 @@ class Osfd(pipeline_tools.FeatureFinderPipeline):
 
     def setup_workspace(self):
         import subprocess
-        subprocess.run('git clone https://github.com/stavis1/OSFD_fork')
-        subprocess.run('conda env create -n osfd_env -f OSFD_fork/env.yml')
+        subprocess.run('git clone https://github.com/stavis1/OSFD_fork', shell = True)
+        subprocess.run('conda env create -n osfd_env -f OSFD_fork/env.yml', shell = True)
         
     def run_job(self, job):
         super().run_job(job)
