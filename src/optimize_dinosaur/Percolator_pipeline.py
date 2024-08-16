@@ -16,10 +16,18 @@ class Percolator(pipeline_tools.Pipeline):
         self.memory = 12
 
     def get_params(self):
-        scores = ['lnrSp','deltLCn','deltCn','lnExpect','Xcorr','Sp','IonFrac','Mass',
-                  'PepLen','enzN','enzC','enzInt','lnNumSP','dM','absdM']
-        scores += [f'-{s}' for s in scores]
-        choices = {'default-direction':scores,
+        choices = {'default-direction':['Xcorr', 
+                                        'enzC', 
+                                        '-lnExpect', 
+                                        'deltCn', 
+                                        '-PepLen', 
+                                        '-lnrSp', 
+                                        'lnNumSP', 
+                                        '-enzInt', 
+                                        'IonFrac', 
+                                        '-Sp', 
+                                        'enzN', 
+                                        '-absdM'],
                    'testFDR':[0.01, 0.001, 0.05],
                    'trainFDR':[0.01, 0.001, 0.05],
                    'maxiter':[10,5,15,20],
