@@ -41,10 +41,7 @@ class Osfd(pipeline_tools.FeatureFinderPipeline):
 
     def setup_workspace(self):
         import subprocess
-        import os
-        if not os.path.isdir('~/.conda/envs/osfd_env'):
-            subprocess.run('git clone https://github.com/stavis1/OSFD_fork', shell = True)
-            subprocess.run('conda env create -n osfd_env -f OSFD_fork/env.yml', shell = True)
+        subprocess.run('singularity build --sandbox --fakeroot osfd.sif docker://stavisvols/osfd')
         
     def run_job(self, job):
         super().run_job(job)
@@ -71,7 +68,7 @@ class Osfd(pipeline_tools.FeatureFinderPipeline):
             #run OSFD                
             args = ' '.join(f'--{k} {v}' for k,v in job.items() if k in self.osfd_param_set)
             for mzml, base_name in zip(mzmls, base_names):
-                subprocess.run(f'conda run -n osfd_env Rscript ../OSFD_fork/peakpicking.R {args} -i {mzml} -o {base_name}.features',
+                subprocess.run(f'singularity run --bind ./:/data/ ../osfd.sif Rscript /osfd/peakpicking.R {args} -i /data/{mzml} -o /data/{base_name}.features',
                                shell = True)
             
             #run peptide rollup
