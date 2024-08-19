@@ -41,8 +41,10 @@ class Osfd(pipeline_tools.FeatureFinderPipeline):
 
     def setup_workspace(self):
         import subprocess
-        subprocess.run('git clone https://github.com/stavis1/OSFD_fork', shell = True)
-        subprocess.run('conda env create -n osfd_env -f OSFD_fork/env.yml', shell = True)
+        import os
+        if not os.path.isdir('~/.conda/envs/osfd_env'):
+            subprocess.run('git clone https://github.com/stavis1/OSFD_fork', shell = True)
+            subprocess.run('conda env create -n osfd_env -f OSFD_fork/env.yml', shell = True)
         
     def run_job(self, job):
         super().run_job(job)
@@ -67,7 +69,7 @@ class Osfd(pipeline_tools.FeatureFinderPipeline):
             start = time()
             
             #run OSFD                
-            args = ' '.join(f'--{k} {v}' for k,v in job if k in self.osfd_param_set)
+            args = ' '.join(f'--{k} {v}' for k,v in job.items() if k in self.osfd_param_set)
             for mzml, base_name in zip(mzmls, base_names):
                 subprocess.run(f'conda run -n osfd_env Rscript ../OSFD_fork/peakpicking.R {args} -i {mzml} -o {base_name}.features',
                                shell = True)
