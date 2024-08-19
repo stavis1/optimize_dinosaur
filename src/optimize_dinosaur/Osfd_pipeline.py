@@ -70,7 +70,7 @@ class Osfd(pipeline_tools.FeatureFinderPipeline):
             args = ' '.join(f'--{k} {v}' for k,v in job.items() if k in self.osfd_param_set)
             singularity_command = 'singularity run --containall --fakeroot --bind ./:/data/ ../osfd.sif'
             for mzml, base_name in zip(mzmls, base_names):
-                osfd_command = 'Rscript /osfd/peakpicking.R {args} -i /data/{mzml} -o /data/{base_name}.features'
+                osfd_command = f'Rscript /osfd/peakpicking.R {args} -i /data/{mzml} -o /data/{base_name}.features'
                 subprocess.run(f'{singularity_command} {osfd_command}',
                                shell = True)
             
