@@ -41,7 +41,8 @@ class Osfd(pipeline_tools.FeatureFinderPipeline):
 
     def setup_workspace(self):
         import subprocess
-        subprocess.run('singularity build --sandbox --fakeroot osfd.sif docker://stavisvols/osfd')
+        subprocess.run('singularity build --sandbox --fakeroot osfd.sif docker://stavisvols/osfd',
+                       shell = True)
         
     def run_job(self, job):
         super().run_job(job)
