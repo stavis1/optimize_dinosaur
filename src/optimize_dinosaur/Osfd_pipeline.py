@@ -65,7 +65,7 @@ class Osfd(pipeline_tools.FeatureFinderPipeline):
         try:
             for file in mzmls + psms:
                 os.link(f'../{file}', file)
-            shutil.copy2('../osfd.sif', './')
+            shutil.copytree('../osfd.sif', './')
             start = time()
             
             #run OSFD                
