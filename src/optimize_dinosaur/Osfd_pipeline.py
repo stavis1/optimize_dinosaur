@@ -51,6 +51,7 @@ class Osfd(pipeline_tools.FeatureFinderPipeline):
         import subprocess
         import shutil
         from time import time
+        import traceback
 
         import pandas as pd
         
@@ -58,7 +59,7 @@ class Osfd(pipeline_tools.FeatureFinderPipeline):
         tmpdir = str(os.getpid())
         print(tmpdir, flush = True)
         os.mkdir(tmpdir)
-        mzmls = [f for f in os.listdir() if f.endswith('.mzML')]
+        mzmls = [f for f in os.listdir() if f.endswith('.mzML') and f.startswith('20210827')]
         base_names = [f[:-5] for f in mzmls]
         psms = [f for f in os.listdir() if f.endswith('_PSMs.txt')]
         os.chdir(tmpdir)
@@ -99,7 +100,7 @@ class Osfd(pipeline_tools.FeatureFinderPipeline):
                 tsv.write('\t'.join(str(r) for r in result_line) + '\n')
             
         except Exception as e:
-            print(e)
+            traceback.print_exc(e)
         #clean up temporary files
         os.chdir('..')
         shutil.rmtree(tmpdir)
