@@ -19,8 +19,8 @@ from optimize_dinosaur import pipeline_tools
 class Osfd(pipeline_tools.FeatureFinderPipeline):
     def __init__(self):
         self.name = 'Osfd'
-        self.cores = 1
-        self.memory = 4
+        self.cores = 2
+        self.memory = 8
         self.timeout = '04:00:00'
         self.get_params()
     
@@ -56,7 +56,7 @@ class Osfd(pipeline_tools.FeatureFinderPipeline):
         
         #set up temporary workspace
         tmpdir = str(os.getpid())
-        print(tmpdir)
+        print(tmpdir, flush = True)
         os.mkdir(tmpdir)
         mzmls = [f for f in os.listdir() if f.endswith('.mzML')]
         base_names = [f[:-5] for f in mzmls]
@@ -74,7 +74,7 @@ class Osfd(pipeline_tools.FeatureFinderPipeline):
             for mzml, base_name in zip(mzmls, base_names):
                 osfd_command = f'Rscript /osfd/peakpicking.R {args} -i /data/{mzml} -o /data/{base_name}.features'
                 command = f'{singularity_command} {osfd_command}'
-                print(command)
+                print(command, flush = True)
                 subprocess.run(command, shell = True)
             
             #run peptide rollup
