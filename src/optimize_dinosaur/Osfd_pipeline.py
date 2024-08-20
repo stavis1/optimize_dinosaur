@@ -41,7 +41,7 @@ class Osfd(pipeline_tools.FeatureFinderPipeline):
 
     def setup_workspace(self):
         import subprocess
-        subprocess.run('singularity build --sandbox --fakeroot osfd.sif docker://stavisvols/osfd',
+        subprocess.run('singularity build --fakeroot osfd.sif docker://stavisvols/osfd',
                        shell = True)
         
     def run_job(self, job):
@@ -65,12 +65,11 @@ class Osfd(pipeline_tools.FeatureFinderPipeline):
         try:
             for file in mzmls + psms:
                 os.link(f'../{file}', file)
-            shutil.copytree('../osfd.sif', 'osfd.sif')
             start = time()
             
             #run OSFD                
             args = ' '.join(f'--{k} {v}' for k,v in job.items() if k in self.osfd_param_set)
-            singularity_command = 'singularity run --containall --fakeroot --bind ./:/data/ osfd.sif'
+            singularity_command = 'singularity run --containall --fakeroot --bind ./:/data/ ../osfd.sif'
             for mzml, base_name in zip(mzmls, base_names):
                 osfd_command = f'Rscript /osfd/peakpicking.R {args} -i /data/{mzml} -o /data/{base_name}.features'
                 command = f'{singularity_command} {osfd_command}'
