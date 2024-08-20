@@ -56,6 +56,7 @@ class Osfd(pipeline_tools.FeatureFinderPipeline):
         
         #set up temporary workspace
         tmpdir = str(os.getpid())
+        print(tmpdir)
         os.mkdir(tmpdir)
         mzmls = [f for f in os.listdir() if f.endswith('.mzML')]
         base_names = [f[:-5] for f in mzmls]
@@ -64,15 +65,17 @@ class Osfd(pipeline_tools.FeatureFinderPipeline):
         try:
             for file in mzmls + psms:
                 os.link(f'../{file}', file)
+            shutil.copy2('../osfd.sif', './')
             start = time()
             
             #run OSFD                
             args = ' '.join(f'--{k} {v}' for k,v in job.items() if k in self.osfd_param_set)
-            singularity_command = 'singularity run --containall --fakeroot --bind ./:/data/ ../osfd.sif'
+            singularity_command = 'singularity run --containall --fakeroot --bind ./:/data/ osfd.sif'
             for mzml, base_name in zip(mzmls, base_names):
                 osfd_command = f'Rscript /osfd/peakpicking.R {args} -i /data/{mzml} -o /data/{base_name}.features'
-                subprocess.run(f'{singularity_command} {osfd_command}',
-                               shell = True)
+                command = f'{singularity_command} {osfd_command}'
+                print(command)
+                subprocess.run(command, shell = True)
             
             #run peptide rollup
             peptide_results = []
