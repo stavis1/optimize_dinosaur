@@ -111,7 +111,7 @@ class FeatureFinderPipeline(PepQuantPipeline):
         for charge in range(1,6):
             rt = psm_rt[psm_idx]
             mz = psm_mass[psm_idx]/charge + H
-            ppm = (mz/1e6)*self.params['ppm']
+            ppm = (mz/1e6)*float(self.params['ppm'])
             rtstart_set = set((i[1] for i in rtstart_idx.irange((rt-max_rt_width,), (rt,))))
             rtend_set = set((i[1] for i in rtend_idx.irange((rt,), (rt+max_rt_width,))))
             rt_set = rtstart_set.intersection(rtend_set)
@@ -140,9 +140,9 @@ class FeatureFinderPipeline(PepQuantPipeline):
         global psm_mass
         psm_mass = {i:mass for i,mass in zip(psms.index, psms['mass'])}
         global rtstart_idx
-        rtstart_idx = SortedList(zip(features['rt_start'] - self.params['rt_wiggle'], features.index))
+        rtstart_idx = SortedList(zip(features['rt_start'] - float(self.params['rt_wiggle']), features.index))
         global rtend_idx
-        rtend_idx = SortedList(zip(features['rt_end'] + self.params['rt_wiggle'], features.index))
+        rtend_idx = SortedList(zip(features['rt_end'] + float(self.params['rt_wiggle']), features.index))
         global max_rt_width
         max_rt_width = max(features['rt_end'] - features['rt_start'])
         global mz_idx
