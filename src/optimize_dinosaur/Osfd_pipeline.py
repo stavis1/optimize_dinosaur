@@ -21,7 +21,7 @@ class Osfd(pipeline_tools.FeatureFinderPipeline):
         self.name = 'Osfd'
         self.cores = 2
         self.memory = 8
-        self.timeout = '04:00:00'
+        self.timeout = '08:00:00'
         self.get_params()
     
     def get_params(self):
