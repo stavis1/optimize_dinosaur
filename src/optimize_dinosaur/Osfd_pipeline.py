@@ -81,6 +81,8 @@ class Osfd(pipeline_tools.FeatureFinderPipeline):
             peptide_results = []
             for base_name in base_names:
                 features = pd.read_csv(f'{base_name}.features', sep = '\t')
+                features['rt_start'] = features['rt_start']/60
+                features['rt_end'] = features['rt_end']/60
                 
                 psms = pd.read_csv(f'{base_name}_PSMs.txt', sep = '\t')
                 psms['mass'] = psms['Theo. MH+ [Da]'] - pipeline_tools.H
