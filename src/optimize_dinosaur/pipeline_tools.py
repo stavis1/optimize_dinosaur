@@ -74,7 +74,8 @@ class PepQuantPipeline(Pipeline):
     def calc_metrics(self, quant1, quant2):
         '''
         arguments:
-            takes two dataframes that are the output of self.peptide_rollup()
+            takes two dataframes that are the output of self.peptide_rollup(),
+            meaning they have the columns sequence, intensity
         returns:
             (quant_depth, mean_relative_error)
         '''
