@@ -8,7 +8,7 @@ Created on Fri Aug 23 13:34:42 2024
 
 from optimize_dinosaur import pipeline_tools
 
-class Flashlfq(pipeline_tools.PepQuantPipeline()):
+class Flashlfq(pipeline_tools.PepQuantPipeline):
     def __init__(self):
         self.name = 'Flashlfq'
         self.cores = 2
