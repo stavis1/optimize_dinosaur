@@ -28,9 +28,9 @@ class Flashlfq(pipeline_tools.PepQuantPipeline):
     
     def set_params(self, params):
         super().set_params(params)
-        self.params.update({'idt':'./psms.tsv',
-                            'rep':'./',
-                            'out':'./',
+        self.params.update({'idt':'/data/psms.tsv',
+                            'rep':'/data/',
+                            'out':'/data/',
                             'thr':2})
     
     def setup_workspace(self):
@@ -83,10 +83,11 @@ class Flashlfq(pipeline_tools.PepQuantPipeline):
         try:
             for file in mzmls + psms:
                 os.link(f'../{file}', file)
-                os.link('../psms.tsv', 'psms.tsv')
+            os.link('../psms.tsv', 'psms.tsv')
             
             flfq_params = ' '.join(f'--{k}={v}' if v != 'true' else '--{k}' for k,v in self.params.items() if v != 'false')
-            command = f'singularity run --containall ../flashlfq.sif {flfq_params}'
+            command = f'singularity run --bind ./:/data/ --containall ../flashlfq.sif {flfq_params}'
+            print(command, flush = True)
             start = time()
             subprocess.run(command, shell = True)
             end = time()
