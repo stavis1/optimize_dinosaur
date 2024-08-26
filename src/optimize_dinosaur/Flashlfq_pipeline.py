@@ -104,7 +104,8 @@ class Flashlfq(pipeline_tools.PepQuantPipeline):
             quant_depth, mre = self.calc_metrics(peptide_results[0], peptide_results[1])
             runtime = end - start
             
-            result_line = list(job.values()) + [quant_depth, mre, runtime]
+            result_line = [v for k,v in job.items() if not k in ('idt', 'rep', 'out', 'thr')]
+            result_line += [quant_depth, mre, runtime]
             with open('../outcomes.tsv', 'a') as tsv:
                 tsv.write('\t'.join(str(r) for r in result_line) + '\n')
             
