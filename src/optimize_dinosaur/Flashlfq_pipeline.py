@@ -97,7 +97,7 @@ class Flashlfq(pipeline_tools.PepQuantPipeline):
             peptide_results = []
             for mzml in mzmls:
                 mzml_col = f'Intensity_{mzml[:-5]}'
-                subset = peptides[mzml_col] > 0
+                subset = peptides[peptides[mzml_col] > 0]
                 subset['sequence'] = subset['Sequence']
                 subset['intensity'] = subset[mzml_col]
                 peptide_results.append(subset[['sequence', 'intensity']])
