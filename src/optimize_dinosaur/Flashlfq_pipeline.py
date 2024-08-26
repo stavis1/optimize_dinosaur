@@ -85,7 +85,7 @@ class Flashlfq(pipeline_tools.PepQuantPipeline):
                 os.link(f'../{file}', file)
             
             flfq_params = ' '.join(f'--{k}={v}' if v != 'true' else '--{k}' for k,v in self.params.items() if v != 'false')
-            command = f'singularity run --fakeroot --containall --bind ./:/data/ ../flashlfq.sif {flfq_params}'
+            command = f'singularity run --containall --bind ./:/data/ ../flashlfq.sif {flfq_params}'
             start = time()
             subprocess.run(command, shell = True)
             end = time()
