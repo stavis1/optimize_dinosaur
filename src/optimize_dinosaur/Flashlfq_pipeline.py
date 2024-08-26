@@ -38,10 +38,7 @@ class Flashlfq(pipeline_tools.PepQuantPipeline):
         import os
         import pandas as pd
         
-        with open('flashlfq.def', 'w') as def_file:
-            def_file.write('Bootstrap: docker\nFrom: smithchemwisc/flashlfq:latest\n%post\n\tmkdir /data/')
-        
-        subprocess.run('singularity build flashlfq.sif flashlfq.def', shell = True)
+        subprocess.run('singularity build flashlfq.sif docker://smithchemwisc/flashlfq:latest', shell = True)
         
         flashlfq_cols = ['File Name', 
                          'Base Sequence',
@@ -88,7 +85,7 @@ class Flashlfq(pipeline_tools.PepQuantPipeline):
                 os.link(f'../{file}', file)
             
             flfq_params = ' '.join(f'--{k}={v}' if v != 'true' else '--{k}' for k,v in self.params.items() if v != 'false')
-            command = f'singularity run --containall --bind ./:/data/ ../flashlfq.sif {flfq_params}'
+            command = f'singularity run --fakeroot --containall --bind ./:/data/ ../flashlfq.sif {flfq_params}'
             start = time()
             subprocess.run(command, shell = True)
             end = time()
