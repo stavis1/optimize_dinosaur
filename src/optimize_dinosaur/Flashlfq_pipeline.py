@@ -83,6 +83,7 @@ class Flashlfq(pipeline_tools.PepQuantPipeline):
         try:
             for file in mzmls + psms:
                 os.link(f'../{file}', file)
+                os.link('../psms.tsv', 'psms.tsv')
             
             flfq_params = ' '.join(f'--{k}={v}' if v != 'true' else '--{k}' for k,v in self.params.items() if v != 'false')
             command = f'singularity run --containall ../flashlfq.sif {flfq_params}'
