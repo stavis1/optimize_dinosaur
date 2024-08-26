@@ -110,6 +110,7 @@ class Flashlfq(pipeline_tools.PepQuantPipeline):
             
         except Exception as e:
             traceback.print_exc(e)
-        #clean up temporary files
-        os.chdir('..')
-        shutil.rmtree(tmpdir)
+        finally:
+            #clean up temporary files
+            os.chdir('..')
+            shutil.rmtree(tmpdir)
