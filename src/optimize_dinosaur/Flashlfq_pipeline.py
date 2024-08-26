@@ -85,7 +85,7 @@ class Flashlfq(pipeline_tools.PepQuantPipeline):
                 os.link(f'../{file}', file)
             os.link('../psms.tsv', 'psms.tsv')
             
-            flfq_params = ' '.join(f'--{k}={v}' if v != 'true' else '--{k}' for k,v in self.params.items() if v != 'false')
+            flfq_params = ' '.join(f'--{k}={v}' if v != 'true' else f'--{k}' for k,v in self.params.items() if v != 'false')
             command = f'singularity run --bind ./:/data/ --containall ../flashlfq.sif {flfq_params}'
             print(command, flush = True)
             start = time()
