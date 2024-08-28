@@ -96,7 +96,7 @@ class PepQuantPipeline(Pipeline):
         quants = quants[np.all(np.isfinite(quants), axis = 1)]
         means = np.mean(quants, axis = 1)
         diffs = np.abs(quants[:,0] - quants[:,1])
-        mre = np.mean(diffs/means)
+        mre = np.nanmean(diffs/means)
 
         return (quant_depth, mre)
 

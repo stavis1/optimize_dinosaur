@@ -71,6 +71,7 @@ class Pyopenms(pipeline_tools.PepQuantPipeline):
         import traceback
 
         import pandas as pd
+        import numpy as np
         
         #set up temporary workspace
         tmpdir = str(os.getpid())
@@ -100,7 +101,8 @@ class Pyopenms(pipeline_tools.PepQuantPipeline):
                                     '--params params',
                                     f'--output {base_name}.results'])
                 subprocess.run(command, shell = True)
-                peptide_results.append(pd.read_csv(f'{base_name}.results', sep = '\t'))
+                peptide_results.append(pd.read_csv(f'{base_name}.results', sep = '\t').replace(0, np.nan))
+                
             end = time()
             
             #process results
