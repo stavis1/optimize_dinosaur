@@ -25,7 +25,7 @@ from sortedcontainers import SortedList
 from collections import defaultdict
 
 psms = pd.read_csv(args.psms, sep = '\t')
-params = pd.read_csv(args.params, sep = '\t', header = False)
+params = pd.read_csv(args.params, sep = '\t', header = None)
 omm_idx = next(i for i,p in zip(params.index, params.iloc[:,0]) if p == 'onMultiMatch')
 args.onMultiMatch = params.iloc[omm_idx, 1]
 params = params.drop(omm_idx)
