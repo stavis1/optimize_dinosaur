@@ -8,7 +8,7 @@ Created on Mon Aug 26 17:20:57 2024
 
 from optimize_dinosaur import pipeline_tools
 
-class Pyopenms(pipeline_tools.FeatureFinderPipeline):
+class Pyopenms(pipeline_tools.PepQuantPipeline):
     def __init__(self):
         self.name = 'Pyopenms'
         self.cores = 2
