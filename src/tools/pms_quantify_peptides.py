@@ -53,7 +53,10 @@ seeds = oms.FeatureMap()
 ff_params = oms.FeatureFinder().getParameters(name)
 for key, val in zip(params.iloc[:,0],params.iloc[:,1]):
     if re.search(r'[^\d\.]', val) is None:
-        val = float(val)
+        if '.' in val:            
+            val = float(val)
+        else:
+            val = int(val)
     ff_params.setValue(key, val)
 ff.run(name, input_map, features, ff_params, seeds)
 features.setUniqueIds()
