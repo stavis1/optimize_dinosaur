@@ -40,6 +40,7 @@ def make_workspace(target, pipeline):
     pipeline.setup_workspace()
 
 def initial_slurm_array_submission(target, pipeline):
+    import os
     import subprocess
     import pandas as pd
 
@@ -53,10 +54,13 @@ def initial_slurm_array_submission(target, pipeline):
                                f'-p {pipeline.name}',
                                '-i $SLURM_ARRAY_TASK_ID']))
     
+    slurm_params_file = os.path.abspath(__file__)
+    slurm_params_file = os.path.split(os.path.split(slurm_params_file)[0])[0]
+    slurm_params_file = os.path.join(slurm_params_file, 'slurm_params.txt')
+    with open(slurm_params_file, 'r') as params_file:
+        local_params = [l.strip() for l in params_file]
+    
     command = ['sbatch',
-               '-A ACF-UTK0011',
-               '-p campus',
-               '--qos=campus',
                f'-t {pipeline.timeout}',
                '--nodes=1',
                f'-c {pipeline.cores}',
@@ -64,10 +68,9 @@ def initial_slurm_array_submission(target, pipeline):
                f'-J {pipeline.name}',
                f'--output=out_{pipeline.name}_%j_%a.log',
                f'--error=err_{pipeline.name}_%j_%a.log',
-               '--mail-type=ALL',
-               '--mail-user=stavis@vols.utk.edu',
-               f'--array=0-{trials.shape[0]-1}',
-               'init_run_script.sbatch']
+               f'--array=0-{trials.shape[0]-1}']
+    command += local_params + ['init_run_script.sbatch']
+    print(command, flush = True)
     command = ' '.join(command)
     
     subprocess.run(command, shell = True)

@@ -75,22 +75,24 @@ def run_optimizer_job(sarry_i, pipeline):
 
 def genetic_slurm_array_submission(pipeline, target, N):
     import subprocess
+    import os
 
+    slurm_params_file = os.path.abspath(__file__)
+    slurm_params_file = os.path.split(os.path.split(slurm_params_file)[0])[0]
+    slurm_params_file = os.path.join(slurm_params_file, 'slurm_params.txt')
+    with open(slurm_params_file, 'r') as params_file:
+        local_params = ['#SBATCH ' + l.strip() for l in params_file]
+    
+    header = ['#!/bin/bash'] + local_params
     with open('genetic_run_script.sbatch', 'w') as sbatch:
-        sbatch.write('\n'.join(['#!/bin/bash',
-                                '#SBATCH -A ACF-UTK0011',
-                                '#SBATCH -p campus',
-                                '#SBATCH --qos=campus',
-                                f'#SBATCH -t {pipeline.timeout}',
-                                '#SBATCH --nodes=1',
-                                f'#SBATCH -c {pipeline.cores}',
-                                f'#SBATCH --mem={pipeline.memory}g',
-                                f'#SBATCH -J {pipeline.name}',
-                                f'#SBATCH --output=out_{pipeline.name}_%j_%a.log',
-                                f'#SBATCH --error=err_{pipeline.name}_%j_%a.log',
-                                '#SBATCH --mail-type=ALL',
-                                '#SBATCH --mail-user=stavis@vols.utk.edu',
-                                f'#SBATCH --array=0-{N-1}\n',]))
+        sbatch.write('\n'.join(header + [f'#SBATCH -t {pipeline.timeout}',
+                                         '#SBATCH --nodes=1',
+                                         f'#SBATCH -c {pipeline.cores}',
+                                         f'#SBATCH --mem={pipeline.memory}g',
+                                         f'#SBATCH -J {pipeline.name}',
+                                         f'#SBATCH --output=out_{pipeline.name}_%j_%a.log',
+                                         f'#SBATCH --error=err_{pipeline.name}_%j_%a.log',
+                                         f'#SBATCH --array=0-{N-1}\n',]))
         sbatch.write(' '.join(['python -m optimize_dinosaur',
                                '-t genetic_job',
                                f'-d {target}',
