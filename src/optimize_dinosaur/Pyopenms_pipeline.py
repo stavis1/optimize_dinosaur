@@ -94,7 +94,7 @@ class Pyopenms(pipeline_tools.PepQuantPipeline):
                 mzml_file = next(mzml for mzml in mzmls if mzml.startswith(base_name))
                 psm_file = next(psm for psm in psms if psm.startswith(base_name))
                 command = ' '.join(['conda run -n pyopenms_env',
-                                    'python pms_quantify_peptides.py',
+                                    'python ../pms_quantify_peptides.py',
                                     f'--mzml {mzml_file}',
                                     f'--psms {psm_file}',
                                     '--params params',
