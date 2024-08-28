@@ -18,7 +18,6 @@ parser.add_argument('--params', action = 'store', required = True,
                     help = 'the tsv of feature detection parameters')
 args = parser.parse_args()
 
-import re
 import pyopenms as oms
 import pandas as pd
 import numpy as np
