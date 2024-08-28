@@ -18,6 +18,7 @@ parser.add_argument('--params', action = 'store', required = True,
                     help = 'the tsv of feature detection parameters')
 args = parser.parse_args()
 
+import re
 import pyopenms as oms
 import pandas as pd
 import numpy as np
@@ -51,6 +52,8 @@ features = oms.FeatureMap()
 seeds = oms.FeatureMap()
 ff_params = oms.FeatureFinder().getParameters(name)
 for key, val in zip(params.iloc[:,0],params.iloc[:,1]):
+    if re.search(r'[^\d\.]', val) is None:
+        val = float(val)
     ff_params.setValue(key, val)
 ff.run(name, input_map, features, ff_params, seeds)
 features.setUniqueIds()
