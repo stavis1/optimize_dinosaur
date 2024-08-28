@@ -78,7 +78,7 @@ def genetic_slurm_array_submission(pipeline, target, N):
     import os
 
     slurm_params_file = os.path.abspath(__file__)
-    slurm_params_file = os.path.split(os.path.split(slurm_params_file)[0])[0]
+    slurm_params_file = os.path.split(os.path.split(os.path.split(slurm_params_file)[0])[0])[0]
     slurm_params_file = os.path.join(slurm_params_file, 'slurm_params.txt')
     with open(slurm_params_file, 'r') as params_file:
         local_params = ['#SBATCH ' + l.strip() for l in params_file]
