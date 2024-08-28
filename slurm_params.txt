@@ -1,0 +1,5 @@
+-A bsd 
+-p batch 
+--qos=bsd-batch
+--mail-type=ALL
+--mail-user=stavis@vols.utk.edu
