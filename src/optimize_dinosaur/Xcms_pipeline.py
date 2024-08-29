@@ -48,7 +48,20 @@ class Xcms_base(pipeline_tools.FeatureFinderPipeline):
                                      '-c bioconda', 
                                      '-c conda-forge']),
                            shell = True)
-        
+    
+    def write_toml(self, data, out_path):
+        '''
+        writes a TOML file formatted for XCMS parameters
+        takes:
+            data: a dictionary of parameters
+            out_path: the file name for the output toml
+        returns:
+            None
+        '''
+        toml = [f'{key} = [ {value},]' for key, value in data.items()]
+        with open(out_path, 'w') as toml_file:
+            toml_file.write('\n'.join(toml))        
+    
     def run_job(self, job):
         super().run_job(job)
         
@@ -73,8 +86,11 @@ class Xcms_base(pipeline_tools.FeatureFinderPipeline):
             for file in mzmls + psms:
                 os.link(f'../{file}', file)
                 
-            #make params file
-            # THIS WILL REQUIRE READING IN THE DEFAULT PARAMS FILE IN ORDER TO GET THE RIGHT DATA TYPES
+            #make params files
+            self.write_toml(dict(i for i in job.items() if i[0] in self.xcms_param_set),
+                            'xcms_params')
+            self.write_toml(dict(i for i in job.items() if i[0] in self.merge_param_set),
+                            'merge_params')
 
             start = time()
             peptide_results = []
@@ -127,6 +143,27 @@ class Xcms_base(pipeline_tools.FeatureFinderPipeline):
             os.chdir('..')
             shutil.rmtree(tmpdir)
 
-
+class Xcms_cw(Xcms_base):
+    def __init__(self):
+        super().__init__()
+        self.name = 'Xcms_cw'
+        self.algorithm = 'xcms_cw'
+    
+    def get_params(self):
+        params = super().get_params()
+        xcms_params = {'ppm':[25,20,15,10,8,5,4],
+                       'peakwidth':[f'{l}, {u}' for l in (20, 30, 40, 15, 10) for u in (50, 40, 70, 90, 120, 150, 300)],
+                       'snthresh':[10,15,8,5,4,3,2],
+                       'prefilter':[f'{l}, {u}' for l in (3, 2, 1, 4, 5, 6) for u in (100, 1000, 10000, 10)],
+                       'mzCenterFun':['"wMean"', '"mean"', '"apex"', '"wMeanApex3"', '"meanApex3"'],
+                       'integrate':[1,2],
+                       'mzdiff':[-0.001, -0.005, -0.01, 0.001, 0.005, 0.01, 0],
+                       'fitgauss':['false','true'],
+                       'noise':[0, 10, 100, 1000, 10000],
+                       'firstBaselineCheck':['true','false'],
+                       'extendLengthMSW':['false','true']}
+        self.xcms_param_set = set(xcms_params.keys())
+        params.update(xcms_params)
+        return params
 
 
