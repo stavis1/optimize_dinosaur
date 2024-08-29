@@ -21,6 +21,17 @@ opt <- parse_args(opt_parser)
 #read spectral data
 mzml <- readMsExperiment(spectraFiles = opt$mzml)
 
+#determine algorithm
+if (opt$algorithm == 'xcms_cw') {
+  alg_params <- CentWaveParam
+} else if (opt$algorithm == 'xcms_cwip'){
+  alg_params <- CentWavePredIsoParam
+} else if (opt$algorithm == 'xcms_mf') {
+  alg_params <- MatchedFilterParam
+} else if (opt$algorithm == 'xcms_kalman') {
+  alg_params <- MassifquantParam
+}
+
 #find peaks
 xcms_params <- read.config(file = opt$xcms_params)
 xcms_params <- do.call(CentWaveParam, xcms_params)
