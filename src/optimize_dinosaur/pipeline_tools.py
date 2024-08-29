@@ -106,6 +106,7 @@ class FeatureFinderPipeline(PepQuantPipeline):
         self.param_choices = {'ppm':[5, 2, 8, 10, 15, 20],
                               'rt_wiggle':[0, 0.01, 0.05, 0.1,]}
         self.pep_rollup_param_set = set(self.param_choices.keys())
+        return self.param_choices
         
     def map_feature(self, psm_idx):
         feature_set = set([])
