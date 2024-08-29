@@ -166,4 +166,78 @@ class Xcms_cw(Xcms_base):
         params.update(xcms_params)
         return params
 
+class Xcms_cwip(Xcms_base):
+    def __init__(self):
+        super().__init__()
+        self.name = 'Xcms_cwpi'
+        self.algorithm = 'xcms_cwpi'
+    
+    def get_params(self):
+        params = super().get_params()
+        xcms_params = {'ppm':[25,20,15,10,8,5,4],
+                       'peakwidth':[f'{l}, {u}' for l in (20, 30, 40, 15, 10) for u in (50, 40, 70, 90, 120, 150, 300)],
+                       'snthresh':[10,15,8,5,4,3,2],
+                       'prefilter':[f'{l}, {u}' for l in (3, 2, 1, 4, 5, 6) for u in (100, 1000, 10000, 10)],
+                       'mzCenterFun':['"wMean"', '"mean"', '"apex"', '"wMeanApex3"', '"meanApex3"'],
+                       'integrate':[1,2],
+                       'mzdiff':[-0.001, -0.005, -0.01, 0.001, 0.005, 0.01, 0],
+                       'fitgauss':['false','true'],
+                       'noise':[0, 10, 100, 1000, 10000],
+                       'firstBaselineCheck':['true','false'],
+                       'extendLengthMSW':['false','true'],
+                       'snthreshIsoROIs':[6.25, 5, 3, 2, 1.5, 7, 8],
+                       'maxCharge':[3, 4, 5],
+                       'maxIso':[5, 4, 3, 2, 6],
+                       'mzIntervalExtension':['true', 'false']}
+        self.xcms_param_set = set(xcms_params.keys())
+        params.update(xcms_params)
+        return params
+
+class Xcms_mf(Xcms_base):
+    def __init__(self):
+        super().__init__()
+        self.name = 'Xcms_mf'
+        self.algorithm = 'xcms_mf'
+    
+    def get_params(self):
+        params = super().get_params()
+        xcms_params = {'binSize':[0.1,0.05,0.01,0.15,0.2],
+                       'impute':['"none"','"lin"','"linbase"','"intlin"'],
+                       'baseValue':[0, 1, 10, 100, 1000],
+                       'distance':[1,2,3,4,5],
+                       'sigma':[12.73994, 10, 8, 6, 15, 18, 20],
+                       'max':[5, 4, 3, 6, 7, 8, 9, 10],
+                       'snthres':[10,15,8,5,4,3,2],
+                       'steps':[2, 1, 3, 4, 5],
+                       'mzdiff':[0.6, 0.4, 0.2, 0.05, 0.8, 1]}
+        self.xcms_param_set = set(xcms_params.keys())
+        params.update(xcms_params)
+        return params
+
+class Xcms_kalman(Xcms_base):
+    def __init__(self):
+        super().__init__()
+        self.name = 'Xcms_kalman'
+        self.algorithm = 'xcms_kalman'
+    
+    def get_params(self):
+        params = super().get_params()
+        xcms_params = {'ppm':[25,20,15,10,8,5,4],
+                       'peakwidth':[f'{l}, {u}' for l in (20, 30, 40, 15, 10) for u in (50, 40, 70, 90, 120, 150, 300)],
+                       'snthresh':[10,15,8,5,4,3,2],
+                       'prefilter':[f'{l}, {u}' for l in (3, 2, 1, 4, 5, 6) for u in (100, 1000, 10000, 10)],
+                       'mzCenterFun':['"wMean"', '"mean"', '"apex"', '"wMeanApex3"', '"meanApex3"'],
+                       'integrate':[1,2],
+                       'mzdiff':[-0.001, -0.005, -0.01, 0.001, 0.005, 0.01, 0],
+                       'fitgauss':['false','true'],
+                       'noise':[0, 10, 100, 1000, 10000],
+                       'criticalValue':[1.125, 0.1, 0.5, 1.5, 2, 2.5, 3],
+                       'consecMissedLimit':[2,1,3],
+                       'unions':[1,0],
+                       'checkBack':[0,1],
+                       'withWave':['false','true']}
+        self.xcms_param_set = set(xcms_params.keys())
+        params.update(xcms_params)
+        return params
+
 
