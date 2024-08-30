@@ -118,6 +118,8 @@ class Xcms_base(pipeline_tools.FeatureFinderPipeline):
                                     'sn',
                                     'sample']
                 features = features[['rt_start', 'rt_end', 'mz', 'intensity']]
+                features['rt_start'] = features['rt_start']/60
+                features['rt_end'] = features['rt_end']/60
                 
                 psms = pd.read_csv(f'{base_name}_PSMs.txt', sep = '\t')
                 psms['mass'] = psms['Theo. MH+ [Da]'] - pipeline_tools.H
