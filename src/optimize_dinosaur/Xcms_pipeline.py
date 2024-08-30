@@ -35,7 +35,7 @@ class Xcms_base(pipeline_tools.FeatureFinderPipeline):
         self.tool_path = os.path.split(os.path.abspath(pipeline_tools.__file__))[0]
         self.tool_path = os.path.join(os.path.split(self.tool_path)[0], 'tools')
         tool = os.path.join(self.tool_path, 'xcms_quantify_features.R')
-        shutil.copy2(tool, 'xcms_quantify_peptides.R')
+        shutil.copy2(tool, 'xcms_quantify_features.R')
         
         #make conda environment for running tool
         if not os.path.isdir('~/.conda/envs/xcms_env'):
