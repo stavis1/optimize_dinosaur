@@ -187,7 +187,6 @@ class Xcms_cwip(Xcms_base):
                        'fitgauss':['false','true'],
                        'noise':[0, 10, 100, 1000, 10000],
                        'firstBaselineCheck':['true','false'],
-                       'extendLengthMSW':['false','true'],
                        'snthreshIsoROIs':[6.25, 5, 3, 2, 1.5, 7, 8],
                        'maxCharge':[3, 4, 5],
                        'maxIso':[5, 4, 3, 2, 6],
