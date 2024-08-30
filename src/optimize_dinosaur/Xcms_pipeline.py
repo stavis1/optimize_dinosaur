@@ -96,7 +96,8 @@ class Xcms_base(pipeline_tools.FeatureFinderPipeline):
             peptide_results = []
             for base_name in base_names:
                 mzml_file = next(mzml for mzml in mzmls if mzml.startswith(base_name))
-                command = ' '.join(['Rscript ../xcms_quantify_features.R',
+                command = ' '.join(['conda run -n xcms_env',
+                                    'Rscript ../xcms_quantify_features.R',
                                     f'--mzml {mzml_file}',
                                     f'--output {base_name}.results',
                                     '--xcms_params xcms_params',
