@@ -172,8 +172,8 @@ class Xcms_cw(Xcms_base):
 class Xcms_cwip(Xcms_base):
     def __init__(self):
         super().__init__()
-        self.name = 'Xcms_cwpi'
-        self.algorithm = 'xcms_cwpi'
+        self.name = 'Xcms_cwip'
+        self.algorithm = 'xcms_cwip'
     
     def get_params(self):
         params = super().get_params()
