@@ -34,7 +34,7 @@ if (opt$algorithm == 'xcms_cw') {
 
 #find peaks
 xcms_params <- read.config(file = opt$xcms_params)
-xcms_params <- do.call(CentWaveParam, xcms_params)
+xcms_params <- do.call(alg_params, xcms_params)
 peaks <- findChromPeaks(mzml, xcms_params)
 
 #merge peaks
