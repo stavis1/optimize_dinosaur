@@ -20,7 +20,10 @@ class Xcms_base(pipeline_tools.FeatureFinderPipeline):
     def get_params(self):
         params = super().get_params()
         
-        merge_params = {}
+        merge_params = {'expandRt':(0, 5, 10, 20, 40, 80, 100),
+                        'expandMz':(0, 0.001, 0.005, 0.01, 0.05, 0.1),
+                        'ppm':(0, 1, 3, 5, 8, 10, 15),
+                        'minProp':(0.75, 0.25, 0.5, 0.8, 0.9, 0.7, 0.6)}
         self.merge_param_set = set(merge_params.keys())
         params.update(merge_params)
         
