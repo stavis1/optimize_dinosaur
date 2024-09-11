@@ -38,7 +38,7 @@ class Xcms_base(pipeline_tools.FeatureFinderPipeline):
         shutil.copy2(tool, 'xcms_quantify_features.R')
         
         #make conda environment for running tool
-        if not os.path.isdir('~/.conda/envs/xcms_env'):
+        if not os.path.isdir(os.path.expanduser('~/.conda/envs/xcms_env')):
             subprocess.run(' '.join(['conda create -n xcms_env', 
                                      'r=4.3',
                                      'r-optparse=1.7.5', 
