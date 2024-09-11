@@ -33,12 +33,12 @@ if (opt$algorithm == 'xcms_cw') {
 }
 
 #find peaks
-xcms_params <- read.config(file = opt$xcms_params)
+xcms_params <- list(read.config(file = opt$xcms_params))
 xcms_params <- do.call(alg_params, xcms_params)
 peaks <- findChromPeaks(mzml, xcms_params)
 
 #merge peaks
-merge_params <- read.config(file = opt$peakmerge_params)
+merge_params <- list(read.config(file = opt$peakmerge_params))
 merge_params <- do.call(MergeNeighboringPeaksParam, merge_params)
 peaks <- refineChromPeaks(peaks, merge_params)
 
