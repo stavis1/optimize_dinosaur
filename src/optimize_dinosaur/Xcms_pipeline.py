@@ -11,8 +11,8 @@ from optimize_dinosaur import pipeline_tools
 class Xcms_base(pipeline_tools.FeatureFinderPipeline):
     def __init__(self):
         self.name = NotImplemented
-        self.cores = 1
-        self.memory = 8
+        self.cores = 2
+        self.memory = 16
         self.timeout = '08:00:00'
         self.algorithm = NotImplemented
         self.get_params()
