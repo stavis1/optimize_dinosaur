@@ -60,7 +60,7 @@ class Xcms_base(pipeline_tools.FeatureFinderPipeline):
         '''
         toml = [f'{key} = [ {value},]' for key, value in data.items()]
         with open(out_path, 'w') as toml_file:
-            toml_file.write('\n'.join(toml))        
+            toml_file.write('\n'.join(toml) + '\n')
     
     def run_job(self, job):
         super().run_job(job)
