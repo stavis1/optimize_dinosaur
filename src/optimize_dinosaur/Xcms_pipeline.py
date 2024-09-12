@@ -13,7 +13,7 @@ class Xcms_base(pipeline_tools.FeatureFinderPipeline):
         self.name = NotImplemented
         self.cores = 2
         self.memory = 16
-        self.timeout = '08:00:00'
+        self.timeout = '04:00:00'
         self.algorithm = NotImplemented
         self.get_params()
     
