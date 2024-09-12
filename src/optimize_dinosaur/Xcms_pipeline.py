@@ -203,11 +203,12 @@ class Xcms_mf(Xcms_base):
         super().__init__()
         self.name = 'Xcms_mf'
         self.algorithm = 'xcms_mf'
-    
+        self.memory = 32
+
     def get_params(self):
         params = super().get_params()
         xcms_params = {'binSize':[0.1,0.05,0.01,0.15,0.2],
-                       'impute':['"none"','"lin"','"linbase"','"intlin"'],
+                       'impute':['"none"','"lin"','"linbase"'],
                        'baseValue':[0, 1, 10, 100, 1000],
                        'distance':[1,2,3,4,5],
                        'sigma':[12.73994, 10, 8, 6, 15, 18, 20],
