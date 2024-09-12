@@ -34,7 +34,10 @@ def make_workspace(target, pipeline):
     jobs = pd.DataFrame([make_job(p, i) for p in params.keys() for i in range(len(params[p]))])
     jobs.columns = params.keys()
     jobs = jobs.drop_duplicates()   
-    jobs.to_csv('initial_trials.tsv', sep = '\t', index = False)
+    jobs.to_csv('initial_trials.tsv', 
+                sep = '\t', 
+                index = False,
+                quoting = 3)
     
     #run pipeline specific setup
     pipeline.setup_workspace()
