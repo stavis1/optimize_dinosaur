@@ -34,11 +34,15 @@ def breeding_population(outcomes, pipeline):
 
 def run_optimizer_job(sarry_i, pipeline):
     import os
+    import time
     
     import pandas as pd
     import numpy as np
     
     rng = np.random.default_rng(os.getpid())
+    #on some systems a large number of jobs get started at the same time
+    #to ensure we don't generate duplicate jobs we stagger the start times randomly
+    time.sleep(rng.uniform(0,20))
     params = pipeline.get_params()
     
     #read finished run data and attempted solutions
