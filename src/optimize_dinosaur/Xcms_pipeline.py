@@ -43,11 +43,11 @@ class Xcms_base(pipeline_tools.FeatureFinderPipeline):
         #make conda environment for running tool
         if not os.path.isdir(os.path.expanduser('~/.conda/envs/xcms_env')):
             subprocess.run(' '.join(['conda create -n xcms_env', 
-                                     'r=4.3',
+                                     'r=4.4.1',
                                      'r-optparse=1.7.5', 
                                      'r-configr=0.3.5', 
-                                     'bioconductor-xcms=4.0.0',
-                                     'bioconductor-msexperiment=1.4.0', 
+                                     'bioconductor-xcms=4.2.3',
+                                     'bioconductor-msexperiment=1.6.0', 
                                      '-c bioconda', 
                                      '-c conda-forge']),
                            shell = True)
