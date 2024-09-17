@@ -32,7 +32,8 @@ class Xcms_base(pipeline_tools.FeatureFinderPipeline):
         import subprocess
 
         #pull docker container based tool
-        subprocess.run('singularity build xcms.sif docker://stavisvols/xcms_quantify_features:latest')
+        subprocess.run('singularity build xcms.sif docker://stavisvols/xcms_quantify_features:latest',
+                       shell = True)
     
     def write_toml(self, data, out_path):
         '''
