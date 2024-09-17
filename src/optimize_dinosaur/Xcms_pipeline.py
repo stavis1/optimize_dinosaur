@@ -22,7 +22,6 @@ class Xcms_base(pipeline_tools.FeatureFinderPipeline):
         
         merge_params = {'expandRt':(0, 5, 10, 20, 40, 80, 100),
                         'expandMz':(0, 0.001, 0.005, 0.01, 0.05, 0.1),
-                        'ppm':(0, 1, 3, 5, 8, 10, 15),
                         'minProp':(0.75, 0.25, 0.5, 0.8, 0.9, 0.7, 0.6)}
         self.merge_param_set = set(merge_params.keys())
         params.update(merge_params)
@@ -31,26 +30,9 @@ class Xcms_base(pipeline_tools.FeatureFinderPipeline):
 
     def setup_workspace(self):
         import subprocess
-        import os
-        import shutil
-        
-        #copy tool script to working directory
-        self.tool_path = os.path.split(os.path.abspath(pipeline_tools.__file__))[0]
-        self.tool_path = os.path.join(os.path.split(self.tool_path)[0], 'tools')
-        tool = os.path.join(self.tool_path, 'xcms_quantify_features.R')
-        shutil.copy2(tool, 'xcms_quantify_features.R')
-        
-        #make conda environment for running tool
-        if not os.path.isdir(os.path.expanduser('~/.conda/envs/xcms_env')):
-            subprocess.run(' '.join(['conda create -n xcms_env', 
-                                     'r=4.4.1',
-                                     'r-optparse=1.7.5', 
-                                     'r-configr=0.3.5', 
-                                     'bioconductor-xcms=4.2.3',
-                                     'bioconductor-msexperiment=1.6.0', 
-                                     '-c bioconda', 
-                                     '-c conda-forge']),
-                           shell = True)
+
+        #pull docker container based tool
+        subprocess.run('singularity build xcms.sif docker://stavisvols/xcms_quantify_features:latest')
     
     def write_toml(self, data, out_path):
         '''
@@ -99,12 +81,12 @@ class Xcms_base(pipeline_tools.FeatureFinderPipeline):
             peptide_results = []
             for base_name in base_names:
                 mzml_file = next(mzml for mzml in mzmls if mzml.startswith(base_name))
-                command = ' '.join(['conda run -n xcms_env',
-                                    'Rscript ../xcms_quantify_features.R',
-                                    f'--mzml {mzml_file}',
-                                    f'--output {base_name}.results',
-                                    '--xcms_params xcms_params',
-                                    '--peakmerge_params merge_params',
+                command = ' '.join(['singularity run --bind ./:/data/ ../xcms.sif',
+                                    'Rscript /xcms/xcms_quantify_features.R',
+                                    f'--mzml /data/{mzml_file}',
+                                    f'--output /data/{base_name}.results',
+                                    '--xcms_params /data/xcms_params',
+                                    '--peakmerge_params /data/merge_params',
                                     f'--algorithm {self.algorithm}'])
                 subprocess.run(command, shell = True)
                 
