@@ -72,7 +72,7 @@ class Dinosaur(pipeline_tools.FeatureFinderPipeline):
                 params.write('\n'.join(f'{k}={v}' for k,v in job.items() if k in self.dinosaur_param_set))
             
             for mzml in mzmls:
-                subprocess.run(f'java -jar ../Dinosaur.jar --advParams={os.path.abspath("dinosaur.params")} --concurrency={self.cores} {mzml}', shell = True)
+                subprocess.run(f'java -Xmx16g -jar ../Dinosaur.jar --advParams={os.path.abspath("dinosaur.params")} --concurrency={self.cores} {mzml}', shell = True)
             
             #run peptide rollup
             peptide_results = []
